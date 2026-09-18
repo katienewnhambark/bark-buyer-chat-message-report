@@ -179,7 +179,7 @@ figure.tl-fig figcaption{padding:9px 12px;font-size:12px;color:var(--ink-3);bord
     <div>
       <div class="eyebrow">Iterable workflow 643021 &middot; project 8947</div>
       <h1>Buyer &mdash; Seller Sent Message</h1>
-      <p class="lede">Send monitoring for the buyer chat-notification journey: what reaches buyers on each channel, what we're testing, and what changed. Figures pulled live from Iterable and Tableau on <span class="mono">13 Sep 2026</span>.</p>
+      <p class="lede">Send monitoring for the buyer chat-notification journey: what reaches buyers on each channel, what we're testing, and what changed. Figures pulled live from Iterable, the warehouse and Tableau on <span class="mono">18 Sep 2026</span>.</p>
     </div>
     <div class="meta-links">
       <a href="https://app.iterable.com/workflows/643021/edit?mode=beta&amp;workflowType=Published&amp;projectId=8947" target="_blank" rel="noopener">Published journey in Iterable &rarr;</a>
@@ -199,7 +199,7 @@ figure.tl-fig figcaption{padding:9px 12px;font-size:12px;color:var(--ink-3);bord
 
     <div class="block">
       <div class="block-head">
-        <h2>Channel reach</h2>
+        <h2>Delivery: expected vs actual</h2>
         <div class="switch" role="group" aria-label="Reporting window">
           <button id="w7" data-win="d7" aria-pressed="false">Last 7 days</button>
           <button id="w30" data-win="d30" aria-pressed="true">Last 30 days</button>
@@ -208,24 +208,63 @@ figure.tl-fig figcaption{padding:9px 12px;font-size:12px;color:var(--ink-3);bord
       <p class="note" id="winNote"></p>
 
       <div class="tiles">
-        <div class="tile"><span class="k">Journey entries (proxy)</span><span class="v num" id="t-entries">&mdash;</span><span class="s">unique buyers sent comm #1 email</span></div>
-        <div class="tile ch-email"><span class="k">Reached by email</span><span class="v num" id="t-emailpc">&mdash;</span><span class="s" id="t-emailn"></span></div>
-        <div class="tile ch-push"><span class="k">Reached by push</span><span class="v num" id="t-pushpc">&mdash;</span><span class="s" id="t-pushn"></span></div>
-        <div class="tile ch-sms"><span class="k">Reached by SMS</span><span class="v num" id="t-smspc">&mdash;</span><span class="s" id="t-smsn"></span></div>
-        <div class="tile"><span class="k">Neither push nor SMS</span><span class="v num" id="t-neitherpc">&mdash;</span><span class="s" id="t-neithern"></span></div>
+        <div class="tile"><span class="k">Buyers reached, any channel</span><span class="v num">996</span><span class="s">last 30 days, warehouse</span></div>
+        <div class="tile ch-email"><span class="k">Reached by email</span><span class="v num">98.5%</span><span class="s">981 buyers</span></div>
+        <div class="tile ch-push"><span class="k">Reached by push</span><span class="v num">40.1%</span><span class="s">399 buyers</span></div>
+        <div class="tile ch-sms"><span class="k">Reached by SMS</span><span class="v num">38.8%</span><span class="s">386 buyers</span></div>
+        <div class="tile"><span class="k">Neither push nor SMS</span><span class="v num">29.1%</span><span class="s">290 buyers, email only</span></div>
       </div>
+      <p class="footnote">Tiles are the full 30-day window from the warehouse send logs, where true distinct-buyer counts and channel overlap are available. The table below follows the window switch and uses Iterable's live-campaign figures.</p>
 
-      <div class="chart">
-        <h3>Who got what, out of everyone who entered</h3>
-        <p class="sub">Unique buyers reached per channel as a share of journey entries. Push and SMS are mutually exclusive by design &mdash; SMS only fires when push was ineligible or undelivered.</p>
-        <div id="reachChart"></div>
+      <div class="tw">
+        <table>
+          <thead><tr><th>Channel</th><th>Messages sent</th><th>Delivered</th><th>Bounced</th><th>Delivery rate</th><th>Distinct buyers</th><th>Share of buyers reached</th></tr></thead>
+          <tbody id="deliveryRows"></tbody>
+        </table>
       </div>
+      <p class="footnote">Delivery rate is your definition: (sends &minus; bounces) &divide; sends for email, delivered &divide; sent for push and SMS. Distinct-buyer counts come from the warehouse send logs and cover the whole campaign group, so the email figure includes the control campaigns that ran until 2 Sep.</p>
 
       <div class="callout warn">
-        <h4>The true event-trigger denominator is not available yet</h4>
-        <p>The figures above use <strong>unique recipients of the comm&nbsp;#1 email as a proxy for journey entries</strong>, on the basis of the 26 Aug finding that 100% of triggering buyers received an email. The real denominator is distinct users firing <span class="mono">chatMessageCreated</span> where <span class="mono">receiver != 'professional'</span>.</p>
-        <p>A Hex thread run against the warehouse on 13 Sep could not produce it: there is <strong>no accessible Iterable custom-event table</strong> carrying <span class="mono">chatMessageCreated</span>, its <span class="mono">receiver</span> field, user ID and event timestamp together, and the current connection was denied query access to the curated <span class="mono">email_log_iterable</span> / <span class="mono">push_log_iterable</span> / <span class="mono">sms_log_iterable</span> tables. Until data eng exposes the event stream, every trigger-based percentage on this page is a proxy, not a measurement.</p>
+        <h4>The denominator you want is still the one thing missing</h4>
+        <p>Every rate in your spec divides by <strong>messages sent</strong> &mdash; <span class="mono">chatMessageCreated</span> where <span class="mono">receiver != 'professional'</span>. That event stream is still not exposed in the warehouse: Hex re-checked on 18 Sep and found no accessible table carrying the event timestamp, buyer identity, <span class="mono">receiver</span> and message direction together. Until it is, "expected" cannot be measured and the percentages above use buyers reached by email as the stand-in.</p>
+        <p><strong>What did change:</strong> the three curated send logs are now queryable, which they were not on 13 Sep. That unlocks the actual side of every delivery rate, the channel overlap, and the push-not-sent half of SMS eligibility.</p>
+        <div class="tw" style="box-shadow:none">
+          <table>
+            <thead><tr><th>Candidate denominator</th><th>30-day value</th><th>Why it is or isn't usable</th></tr></thead>
+            <tbody>
+              <tr><td><span class="mono">chatMessageCreated</span> events, receiver &ne; professional</td><td class="blocked">not available</td><td class="l">The real thing. Needs the Iterable custom-event stream exposed.</td></tr>
+              <tr><td>Distinct buyers sent a journey email</td><td>981</td><td class="l">Used above. Rests on the 26 Aug finding that every triggering buyer gets an email.</td></tr>
+              <tr><td>Polaris enquiries with a seller message (Tableau)</td><td>1,638</td><td class="l">Enquiry-level and first message only, so it undercounts repeat messages.</td></tr>
+              <tr><td>Polaris buyers with a seller response (Tableau)</td><td>922</td><td class="l"><strong>Do not use.</strong> Fewer than the 981 buyers who received an email, so the journey clearly reaches buyers outside Polaris enquiries.</td></tr>
+            </tbody>
+          </table>
+        </div>
       </div>
+    </div>
+
+    <div class="block">
+      <h2>Channel overlap</h2>
+      <p class="note">Distinct buyers by the combination of channels they received, 19 Aug &ndash; 17 Sep. Source: the three warehouse send logs.</p>
+      <div class="tw">
+        <table>
+          <thead><tr><th>Channels received</th><th>Distinct buyers</th><th>Share of 996 reached</th></tr></thead>
+          <tbody>
+            <tr><td>Email + push</td><td>316</td><td>31.7%</td></tr>
+            <tr><td>Email + SMS</td><td>296</td><td>29.7%</td></tr>
+            <tr><td>Email only</td><td>290</td><td>29.1%</td></tr>
+            <tr><td><strong>Email + push + SMS</strong></td><td><strong>79</strong></td><td><strong>7.9%</strong></td></tr>
+            <tr><td>SMS only</td><td>11</td><td>1.1%</td></tr>
+            <tr><td>Push only</td><td>4</td><td>0.4%</td></tr>
+            <tr><td>Push + SMS, no email</td><td>0</td><td>0%</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="callout crit">
+        <h4>The push-and-SMS overlap is far bigger than the spot check suggested</h4>
+        <p><strong>79 buyers received both push and SMS</strong> in the 30-day window, not the 3 found in the 26 Aug spot check. That is 7.9% of everyone the journey reached, and roughly one in five of everyone who got an SMS. Every one of them also received an email, so a meaningful slice of buyers is getting three notifications for the same seller message.</p>
+        <p>This is period-level overlap rather than proof of the race condition on its own &mdash; confirming that needs each buyer's push and SMS timestamps checked against the same trigger. But it moves the 10-minute push-check delay from a tidy-up to the highest-value fix on this journey, and it is worth costing: 79 buyers over 30 days is 79 avoidable SMS.</p>
+      </div>
+      <p class="footnote">Only 15 buyers (1.5%) received push or SMS without an email, which supports the 26 Aug finding that essentially everyone entering the journey gets an email.</p>
     </div>
 
     <div class="block">
@@ -238,7 +277,7 @@ figure.tl-fig figcaption{padding:9px 12px;font-size:12px;color:var(--ink-3);bord
           <tbody id="emailRows"></tbody>
         </table>
       </div>
-      <p class="footnote">Rates are per unique recipient (Iterable "unique" metrics count distinct users, not messages &mdash; a buyer messaged twice in the window counts once). Sends counts messages. Unsub rate is unique buyers clicking through to the hosted unsubscribe page over unique recipients &mdash; recorded list unsubscribes were zero in both windows, so nobody who landed there completed it. Bounce rate is bounced messages over sends.</p>
+      <p class="footnote">Rates are per unique recipient (Iterable "unique" metrics count distinct users, not messages &mdash; a buyer messaged twice in the window counts once). Sends counts messages. Unsub rate is unique buyers reaching the hosted unsubscribe page over unique recipients. Bounce rate is bounced messages over sends.</p>
     </div>
 
     <div class="block">
@@ -246,12 +285,11 @@ figure.tl-fig figcaption{padding:9px 12px;font-size:12px;color:var(--ink-3);bord
       <div class="tw">
         <table>
           <thead><tr>
-            <th>Campaign</th><th>Sends</th><th>Delivered</th><th>Delivery rate</th><th>Entry &rarr; push</th><th>Open rate</th><th>Uninstalls</th>
+            <th>Campaign</th><th>Sends</th><th>Delivered</th><th>Delivery rate</th><th>Share of buyers reached</th><th>Open rate</th><th>Uninstalls</th>
           </tr></thead>
           <tbody id="pushRows"></tbody>
         </table>
       </div>
-      <p class="footnote">"Entry &rarr; push" is unique buyers delivered a push as a share of journey entries (proxy denominator above). Open rate is unique opens over unique delivered.</p>
     </div>
 
     <div class="block">
@@ -259,15 +297,15 @@ figure.tl-fig figcaption{padding:9px 12px;font-size:12px;color:var(--ink-3);bord
       <div class="tw">
         <table>
           <thead><tr>
-            <th>Campaign</th><th>Sends</th><th>Delivered</th><th>Delivery rate</th><th>Entry &rarr; SMS</th><th>Click rate</th><th>Click rate (filt.)</th>
+            <th>Campaign</th><th>Sends</th><th>Delivered</th><th>Delivery rate</th><th>Share of buyers reached</th><th>Click rate</th><th>Click rate (filt.)</th>
           </tr></thead>
           <tbody id="smsRows"></tbody>
         </table>
       </div>
       <div class="callout crit">
-        <h4>Do not report the current SMS click rate as a win</h4>
+        <h4>SMS click rate is still not measuring humans</h4>
         <p id="smsWarn"></p>
-        <p>Iterable are checking whether bot-filtering rules regressed on this campaign: every SMS click event carries an <span class="mono">isBot</span> flag, and the filtered figure excludes flagged clicks. They have seen a batch of clearly automated clicks stop being flagged before, and have confirmed the quiet-hours removal could not move click rate this far. Treat 8&nbsp;Sep onwards as suspect until they come back.</p>
+        <p>Iterable are checking whether bot-filtering regressed on this campaign: every SMS click event carries an <span class="mono">isBot</span> flag, and the filtered figure excludes flagged clicks. Since 11 Sep the filtered and unfiltered figures have converged, which is the opposite of what a working filter looks like. Do not report SMS click rate in any weekly summary until they come back.</p>
       </div>
     </div>
 
@@ -275,26 +313,90 @@ figure.tl-fig figcaption{padding:9px 12px;font-size:12px;color:var(--ink-3);bord
       <h2>SMS eligibility</h2>
       <div class="tw">
         <table>
-          <thead><tr><th>Eligibility condition</th><th>Buyers</th><th>Source</th></tr></thead>
+          <thead><tr><th>Eligibility condition</th><th>Status</th><th>Source</th></tr></thead>
           <tbody>
-            <tr><td>Triggered <span class="mono">chatMessageCreated</span> (receiver &ne; professional)</td><td class="blocked">not available</td><td style="text-align:left">Iterable custom events</td></tr>
-            <tr><td>&hellip; and has no app, or push not enabled</td><td class="blocked">not available</td><td style="text-align:left"><span class="mono">buyer_user.buyer_has_app</span> (lifetime only)</td></tr>
-            <tr><td>&hellip; and has a phone number</td><td class="blocked">not available</td><td style="text-align:left"><span class="mono">buyer_phone_number_formatted</span></td></tr>
-            <tr><td>&hellip; and is SMS opted in</td><td class="blocked">no field found</td><td style="text-align:left">&mdash;</td></tr>
-            <tr><td>&hellip; and triggered only once in any rolling 18h window<br><span style="font-size:12px;color:var(--ink-3)">Largely neutralised from 16 Sep &mdash; the message preview makes consecutive SMS non-identical</span></td><td class="blocked">not available</td><td style="text-align:left">needs event stream</td></tr>
-            <tr class="total"><td>Eligible, and actually sent an SMS</td><td class="blocked">blocked</td><td style="text-align:left">&mdash;</td></tr>
+            <tr><td>Triggered <span class="mono">chatMessageCreated</span> (receiver &ne; professional)</td><td class="blocked">not available</td><td class="l">Iterable custom events &mdash; still not exposed</td></tr>
+            <tr><td>&hellip; and push was not sent</td><td style="color:var(--good);font-weight:600">now computable</td><td class="l"><span class="mono">push_log_iterable</span> &mdash; access restored 18 Sep</td></tr>
+            <tr><td>&hellip; and has a phone number on file</td><td style="color:var(--good);font-weight:600">now computable</td><td class="l"><span class="mono">buyer_user.phone_number_formatted</span></td></tr>
+            <tr><td>&hellip; and is SMS opted in</td><td class="blocked">no field found</td><td class="l">&mdash;</td></tr>
+            <tr><td>&hellip; and triggered only once in any rolling 18h window<br><span style="font-size:12px;color:var(--ink-3)">Largely neutralised from 16 Sep &mdash; the message preview makes consecutive SMS non-identical</span></td><td class="blocked">not available</td><td class="l">needs the event stream</td></tr>
+            <tr class="total"><td>Eligible, and actually sent an SMS</td><td class="blocked">blocked on 2 of 5 conditions</td><td class="l">&mdash;</td></tr>
           </tbody>
         </table>
       </div>
       <div class="callout info">
-        <h4>What we need to fill this table</h4>
+        <h4>Two asks left for data eng, down from four</h4>
         <ul>
-          <li>Query access to <span class="mono">insight_roots.email_log_iterable</span>, <span class="mono">push_log_iterable</span> and <span class="mono">sms_log_iterable</span> for the Hex connection.</li>
-          <li>An exposed Iterable custom-event source with <span class="mono">chatMessageCreated</span>, <span class="mono">receiver</span>, user ID and UTC timestamp.</li>
+          <li>Expose the Iterable custom-event stream with <span class="mono">chatMessageCreated</span>, its <span class="mono">receiver</span> field, buyer identity and UTC timestamp. This is the blocker for the whole "expected" side.</li>
           <li>A point-in-time buyer SMS consent field. <span class="mono">buyer_notify_email_eligible</span> is email eligibility and must not be used as SMS consent.</li>
-          <li>Point-in-time app-install / push-enabled state. <span class="mono">buyer_has_app</span> is lifetime ("has logged in at least once"), so it overstates eligibility for push and understates it for SMS.</li>
         </ul>
-        <p>Worth adding to Ailish's <a href="https://barkdev.atlassian.net/browse/IST-6640" target="_blank" rel="noopener">IST-6640</a> rather than raising separately.</p>
+        <p>Warehouse access to the three send logs and to phone-number state is resolved. Worth updating <a href="https://barkdev.atlassian.net/browse/IST-6640" target="_blank" rel="noopener">IST-6640</a> rather than raising fresh.</p>
+      </div>
+    </div>
+
+    <div class="block">
+      <h2 id="afterSendH">After the send</h2>
+      <p class="note">Did the buyer come back, and did they reply? Source: <span class="mono">insight_reporting.crm_sms_push_whatsapp</span>, the endorsed daily CRM reporting table.</p>
+      <div class="tw">
+        <table>
+          <thead><tr><th>Channel</th><th>Sends</th><th>Eligible buyers</th><th>Returned to site or app</th><th>Return rate</th><th>Sent a message</th><th>Message rate</th></tr></thead>
+          <tbody id="afterRows"></tbody>
+        </table>
+      </div>
+      <p class="footnote">Attribution mode <span class="mono">any_7d_post_send</span>: the buyer acted after the send and within 7 days of it. "Eligible" means the message was not a send-skip &mdash; it is not channel eligibility. Buyer counts are recipient-day aggregates, so they are correct as rates but should not be summed into distinct-buyer totals. "Returned" counts Polaris web paths (<span class="mono">/slf/</span>, <span class="mono">/inbox</span>, <span class="mono">/n/</span>) plus Android and iOS app sessions. "Sent a message" means the buyer sent a Polaris chat message, attributed to their most recent eligible send &mdash; not necessarily a reply in the conversation that triggered it.</p>
+
+      <div class="callout crit">
+        <h4>Email is missing from this table because the feed stopped</h4>
+        <p>The email equivalent, <span class="mono">insight_reporting.polaris_email_stats</span>, has produced <strong>zero buyer-session and buyer-message values since 27 Aug 2026</strong> &mdash; three weeks of nulls while send, open and click keep populating normally. That is a stale or broken attribution feed, not buyers going quiet.</p>
+        <p>Its definitions also differ from the push/SMS table: it counts <em>emails with an attributed outcome</em> rather than distinct eligible buyers, and has no attribution mode, so even once fixed the two are not directly comparable. Worth raising with Neil alongside the custom-event ask.</p>
+      </div>
+
+      <div class="callout info">
+        <h4>Push outperforms SMS on both downstream measures</h4>
+        <p id="afterNote"></p>
+        <p>That ordering is worth holding onto when the 10-minute delay ships: the journey sends SMS only when push was ineligible or undelivered, so a buyer getting SMS instead of push is already the weaker path. Fixing the race condition removes duplicate sends; it does not move anyone from SMS onto push.</p>
+      </div>
+    </div>
+
+    <div class="block">
+      <h2>Marketplace response rate and sessions</h2>
+      <p class="note">From the Tableau <a href="https://eu-west-1a.online.tableau.com/#/site/bark/views/EnquiryPerformance/Responsiveness" target="_blank" rel="noopener">Enquiry Performance &rarr; Responsiveness</a> dashboard's underlying data source. Polaris enquiries marketplace-wide &mdash; <strong>not</strong> filtered to buyers who received this journey, so read it as context, not as this journey's effect.</p>
+      <div class="tiles">
+        <div class="tile"><span class="k">Seller response rate</span><span class="v num" id="e-seller">&mdash;</span><span class="s" id="e-sellern"></span></div>
+        <div class="tile"><span class="k">Buyer response rate</span><span class="v num" id="e-buyer">&mdash;</span><span class="s" id="e-buyern"></span></div>
+        <div class="tile"><span class="k">Buyer replied in chat</span><span class="v num" id="e-chat">&mdash;</span><span class="s" id="e-chatn"></span></div>
+        <div class="tile"><span class="k">Buyer sessions</span><span class="v num" id="e-sess">&mdash;</span><span class="s">distinct sessions on the enquiry</span></div>
+        <div class="tile"><span class="k">Median seller reply time</span><span class="v num" id="e-median">&mdash;</span><span class="s">from enquiry created</span></div>
+      </div>
+      <div class="chart">
+        <h3>Buyer response rate by week</h3>
+        <p class="sub">Buyers who replied, as a share of enquiries where the seller responded.</p>
+        <div id="weekChart"></div>
+      </div>
+      <div class="callout warn">
+        <h4>The recent dip is almost certainly maturity, not behaviour</h4>
+        <p>Buyer response rate reads 22.9% across 19 Aug &ndash; 10 Sep and 16.7% across 11 &ndash; 17 Sep, a 6.2pp fall that is statistically significant on its face. But the weekly series falls steadily as it approaches today and bottoms at 14.3% for 16 &ndash; 17 Sep, which is the signature of right-censoring: the most recent enquiries have had the least time for the buyer to reply. Seller response rate over the same period is flat, so nothing structural has changed.</p>
+        <p>Read this metric on enquiries at least 7 days old, or compare fixed-age cohorts. Taking the last 7 days at face value will show a decline that isn't there.</p>
+      </div>
+    </div>
+
+    <div class="block">
+      <h2>Metric coverage</h2>
+      <p class="note">Your spec, against what the report can currently show.</p>
+      <div class="tw">
+        <table>
+          <thead><tr><th>Requested metric</th><th>Status</th><th>Where it is</th></tr></thead>
+          <tbody>
+            <tr><td>Email delivery rate = (sends &minus; bounces) &divide; messages sent</td><td class="l"><span class="pill live">Actual side in</span></td><td class="l">Delivery table. Denominator blocked.</td></tr>
+            <tr><td>Push / SMS delivery = received &divide; messages sent</td><td class="l"><span class="pill live">Actual side in</span></td><td class="l">Delivery table. Denominator blocked.</td></tr>
+            <tr><td>SMS = sent &divide; (messages sent, push not sent, phone on file)</td><td class="l"><span class="pill off">3 of 5 conditions</span></td><td class="l">SMS eligibility table</td></tr>
+            <tr><td>Received one of the above</td><td class="l"><span class="pill live">In</span></td><td class="l">Tiles and delivery table</td></tr>
+            <tr><td>Returned to inbox app or web after receiving</td><td class="l"><span class="pill live">In</span></td><td class="l">After the send</td></tr>
+            <tr><td>Messages sent after receiving</td><td class="l"><span class="pill live">In</span></td><td class="l">After the send</td></tr>
+            <tr><td>Clicks, opens, unsubs, bounces</td><td class="l"><span class="pill live">In</span></td><td class="l">Email, Push and SMS tables</td></tr>
+            <tr><td>Response rate and sessions</td><td class="l"><span class="pill live">In</span></td><td class="l">Marketplace response rate and sessions</td></tr>
+          </tbody>
+        </table>
       </div>
     </div>
 
@@ -448,23 +550,46 @@ figure.tl-fig figcaption{padding:9px 12px;font-size:12px;color:var(--ink-3);bord
 // Iterable campaign metrics. d30 = 14 Aug-12 Sep 2026, d7 = 6-12 Sep 2026.
 // send/deliv/bounce count messages; u* count distinct users.
 const M = {
-  19381134:{d30:{send:526,deliv:526,bounce:0,uSend:228,uDeliv:228,uOpen:109,uOpenF:106,uClick:61,uUnsub:2},
-            d7 :{send:174,deliv:174,bounce:0,uSend:78, uDeliv:78, uOpen:40, uOpenF:40, uClick:21,uUnsub:1}},
-  19381812:{d30:{send:2174,deliv:2164,bounce:10,uSend:716,uDeliv:710,uOpen:423,uOpenF:415,uClick:206,uUnsub:15},
-            d7 :{send:702, deliv:694, bounce:8, uSend:219,uDeliv:215,uOpen:136,uOpenF:136,uClick:75, uUnsub:6}},
-  19381863:{d30:{send:62,deliv:62,bounce:0,uSend:18,uDeliv:18,uOpen:10,uOpenF:10,uClick:3,uUnsub:2},
-            d7 :{send:18,deliv:18,bounce:0,uSend:8, uDeliv:8, uOpen:5, uOpenF:5, uClick:1,uUnsub:2}},
-  13384256:{d30:{send:1580,deliv:1578,uSend:411,uDeliv:409,uOpen:147,uninst:4},
-            d7 :{send:339, deliv:339, uSend:116,uDeliv:116,uOpen:32, uninst:0}},
-  17690487:{d30:{send:5,deliv:5,uSend:4,uDeliv:4,uOpen:0,uninst:0},
-            d7 :{send:2,deliv:2,uSend:2,uDeliv:2,uOpen:0,uninst:0}},
-  16373389:{d30:{send:30,deliv:30,uSend:7,uDeliv:7,uOpen:1,uninst:0},
-            d7 :{send:8, deliv:8, uSend:3,uDeliv:3,uOpen:0,uninst:0}},
-  16985565:{d30:{send:544,deliv:541,bounce:3,uSend:405,uDeliv:402,uClick:239,uClickF:185},
-            d7 :{send:118,deliv:116,bounce:2,uSend:97, uDeliv:95, uClick:87, uClickF:84}},
-  16988774:{d30:{send:19,deliv:19,bounce:0,uSend:10,uDeliv:10,uClick:6,uClickF:3},
-            d7 :{send:4, deliv:4, bounce:0,uSend:2, uDeliv:2, uClick:2,uClickF:2}}
+  19381134:{d30:{send:646,deliv:646,bounce:0,uSend:243,uDeliv:243,uOpen:120,uOpenF:117,uClick:71,uUnsub:2},
+            d7 :{send:235,deliv:235,bounce:0,uSend:82, uDeliv:82, uOpen:44, uOpenF:44, uClick:21,uUnsub:1}},
+  19381812:{d30:{send:2169,deliv:2156,bounce:13,uSend:634,uDeliv:625,uOpen:396,uOpenF:388,uClick:207,uUnsub:18},
+            d7 :{send:626, deliv:619, bounce:7, uSend:188,uDeliv:184,uOpen:111,uOpenF:111,uClick:53, uUnsub:7}},
+  19381863:{d30:{send:73,deliv:73,bounce:0,uSend:24,uDeliv:24,uOpen:14,uOpenF:14,uClick:5,uUnsub:3},
+            d7 :{send:14,deliv:14,bounce:0,uSend:9, uDeliv:9, uOpen:5, uOpenF:5, uClick:2,uUnsub:1}},
+  13384256:{d30:{send:1624,deliv:1622,uSend:397,uDeliv:395,uOpen:149,uninst:4},
+            d7 :{send:385, deliv:385, uSend:105,uDeliv:105,uOpen:35, uninst:0}},
+  17690487:{d30:{send:6,deliv:6,uSend:5,uDeliv:5,uOpen:0,uninst:0},
+            d7 :{send:1,deliv:1,uSend:1,uDeliv:1,uOpen:0,uninst:0}},
+  16373389:{d30:{send:33,deliv:33,uSend:8,uDeliv:8,uOpen:0,uninst:0},
+            d7 :{send:5, deliv:5, uSend:3,uDeliv:3,uOpen:0,uninst:0}},
+  16985565:{d30:{send:522,deliv:518,bounce:4,uSend:385,uDeliv:381,uClick:269,uClickF:228},
+            d7 :{send:109,deliv:107,bounce:2,uSend:92, uDeliv:90, uClick:91, uClickF:91}},
+  16988774:{d30:{send:23,deliv:23,bounce:0,uSend:14,uDeliv:14,uClick:10,uClickF:7},
+            d7 :{send:4, deliv:4, bounce:0,uSend:4, uDeliv:4, uClick:4,uClickF:4}}
 };
+
+// Warehouse (insight_roots.*_log_iterable), workflow 643021 / buyer_chat_notification, 19 Aug - 17 Sep.
+// Includes the control campaigns that were live until 2 Sep, so email exceeds the live-campaign totals above.
+const WAREHOUSE = {email:{msgs:3798,buyers:981}, push:{msgs:1663,buyers:399}, sms:{msgs:544,buyers:386}};
+// 30-day channel overlap, distinct buyers (warehouse send logs, non-skipped, buyer_user_id not null)
+const OVERLAP = {emailOnly:290, pushOnly:4, smsOnly:11, emailPush:316, emailSms:296, pushSms:0, all:79};
+// insight_reporting.crm_sms_push_whatsapp, attribution_mode = any_7d_post_send
+const AFTER = {
+  d30:{label:"19 Aug - 17 Sep",
+       push:{send:1663, eligible:751, session:162, message:154},
+       sms :{send:544,  eligible:532, session:92,  message:60}},
+  d7 :{label:"11 - 17 Sep",
+       push:{send:397, eligible:187, session:42, message:39},
+       sms :{send:114, eligible:111, session:21, message:11}}
+};
+
+// Tableau, published datasource "Enquiry" (Polaris enquiries, marketplace-wide - not filtered to this journey)
+const ENQ = {
+  d30:{label:"19 Aug - 17 Sep", enq:3218, enqResp:1987, onPlat:1647, msgReply:1638, consResp:425, consChat:398, buyers:1123, buyersResp:922, sessions:1155, medianReply:116},
+  d7 :{label:"11 - 17 Sep",     enq:830,  enqResp:490,  onPlat:395,  msgReply:393,  consResp:82,  consChat:76,  buyers:271,  buyersResp:219, sessions:279,  medianReply:101.5}
+};
+// Buyer response rate by week - used to show the maturity lag
+const ENQ_WEEKS = [["19-25 Aug",546,113],["26 Aug-1 Sep",358,93],["2-8 Sep",418,96],["9-15 Sep",574,110],["16-17 Sep",91,13]];
 
 const NAMES = {
   19381134:["Email 1 &mdash; new design (marketing)","buyer_chat_message_260813_2"],
@@ -584,31 +709,47 @@ function sum(ids,win,keys){
 }
 
 function render(win){
-  const label = win==="d30" ? "14 Aug &ndash; 12 Sep 2026 (30 days)" : "6 &ndash; 12 Sep 2026 (7 days)";
+  const E = ENQ[win];
   document.getElementById("winNote").innerHTML =
-    `Showing <strong>${label}</strong>. Journey entries are proxied by unique recipients of the comm&nbsp;#1 email &mdash; see the note below.`;
+    `Showing <strong>${E.label} 2026</strong>. Every rate in your spec divides by messages sent &mdash; the <span class="mono">chatMessageCreated</span> trigger &mdash; which is not yet available, so shares below use buyers reached by email as the stand-in. See the note under the table.`;
 
-  // reach tiles
-  const entryIds=[19381134,19381812];
-  const entries = entryIds.reduce((a,id)=>a+M[id][win].uDeliv,0);
+  const entries = M[19381134][win].uDeliv + M[19381812][win].uDeliv;
+
+  // --- channel roll-ups from the live campaigns ---
+  const ch = {
+    email:{ids:EMAIL_IDS, colour:"email"},
+    push :{ids:PUSH_IDS,  colour:"push"},
+    sms  :{ids:SMS_IDS,   colour:"sms"}
+  };
+  const roll = {};
+  for(const k in ch){
+    const t={send:0,deliv:0,bounce:0,uDeliv:0};
+    ch[k].ids.forEach(id=>{
+      const d=M[id][win];
+      t.send+=d.send; t.deliv+=d.deliv; t.bounce+=(d.bounce||0); t.uDeliv+=d.uDeliv;
+    });
+    roll[k]=t;
+  }
   const pushU = M[13384256][win].uDeliv;
   const smsU  = M[16985565][win].uDeliv;
   const neither = Math.max(entries - pushU - smsU, 0);
 
-  document.getElementById("t-entries").textContent = fnum(entries);
-  document.getElementById("t-emailpc").innerHTML = "100%";
-  document.getElementById("t-emailn").textContent = fnum(entries)+" buyers";
-  document.getElementById("t-pushpc").innerHTML = fpc(pc(pushU,entries));
-  document.getElementById("t-pushn").textContent = fnum(pushU)+" buyers";
-  document.getElementById("t-smspc").innerHTML = fpc(pc(smsU,entries));
-  document.getElementById("t-smsn").textContent = fnum(smsU)+" buyers";
-  document.getElementById("t-neitherpc").innerHTML = fpc(pc(neither,entries));
-  document.getElementById("t-neithern").textContent = fnum(neither)+" buyers";
-
-  drawReach(entries,pushU,smsU,neither);
-
-  // email table
+  const share = {email:"100%", push:fpc(pc(pushU,entries)), sms:fpc(pc(smsU,entries))};
+  const label = {email:"Email", push:"Push", sms:"SMS"};
   let rows="";
+  ["email","push","sms"].forEach(k=>{
+    const t=roll[k];
+    rows += `<tr><td><span class="pill ${k}">${label[k]}</span></td><td>${fnum(t.send)}</td><td>${fnum(t.deliv)}</td>
+      <td>${fnum(t.bounce)}</td><td>${fpc(pc(t.deliv,t.send))}</td><td>${fnum(t.uDeliv)}</td><td>${share[k]}</td></tr>`;
+  });
+  const tot={send:0,deliv:0,bounce:0};
+  ["email","push","sms"].forEach(k=>{tot.send+=roll[k].send;tot.deliv+=roll[k].deliv;tot.bounce+=roll[k].bounce;});
+  rows += `<tr class="total"><td>All channels</td><td>${fnum(tot.send)}</td><td>${fnum(tot.deliv)}</td><td>${fnum(tot.bounce)}</td>
+    <td>${fpc(pc(tot.deliv,tot.send))}</td><td>&mdash;</td><td>&mdash;</td></tr>`;
+  document.getElementById("deliveryRows").innerHTML=rows;
+
+  // --- email table ---
+  rows="";
   EMAIL_IDS.forEach(id=>{
     const d=M[id][win];
     rows += `<tr><td>${nameCell(id)}</td><td>${fnum(d.send)}</td><td>${fnum(d.uSend)}</td>
@@ -621,7 +762,7 @@ function render(win){
     <td>${fpc(pc(et.uClick,et.uDeliv))}</td><td>${fpc2(pc(et.uUnsub,et.uDeliv))}</td><td>${fpc2(pc(et.bounce,et.send))}</td></tr>`;
   document.getElementById("emailRows").innerHTML=rows;
 
-  // push table
+  // --- push table ---
   rows="";
   PUSH_IDS.forEach(id=>{
     const d=M[id][win];
@@ -634,7 +775,7 @@ function render(win){
     <td>${fpc(pc(pt.deliv,pt.send))}</td><td>&mdash;</td><td>${fpc(pc(pt.uOpen,pt.uDeliv))}</td><td>${fnum(pt.uninst)}</td></tr>`;
   document.getElementById("pushRows").innerHTML=rows;
 
-  // sms table
+  // --- sms table ---
   rows="";
   SMS_IDS.forEach(id=>{
     const d=M[id][win];
@@ -649,32 +790,55 @@ function render(win){
 
   const s30=M[16985565].d30, s7=M[16985565].d7;
   document.getElementById("smsWarn").innerHTML =
-    `SMS 1 clicked at <strong>${fpc(pc(s7.uClick,s7.uDeliv))}</strong> of delivered buyers in the last 7 days against <strong>${fpc(pc(s30.uClick,s30.uDeliv))}</strong> across 30 days. Daily figures move from around 49% (1&ndash;7 Sep) to 91% (8&ndash;11 Sep) &mdash; a 43pp jump, p&nbsp;&lt;&nbsp;0.0001. A click rate near 90% on an SMS is not plausible human behaviour.`;
+    `SMS 1 recorded <strong>${fnum(s7.uClick)} unique clickers against ${fnum(s7.uDeliv)} delivered buyers</strong> in the last 7 days &mdash; a click rate above 100%, which is not possible from human behaviour. Over 30 days it reads ${fpc(pc(s30.uClick,s30.uDeliv))}.`;
+
+  // --- marketplace response ---
+  document.getElementById("e-seller").innerHTML = fpc(pc(E.enqResp,E.enq));
+  document.getElementById("e-sellern").textContent = fnum(E.enqResp)+" of "+fnum(E.enq)+" enquiries";
+  document.getElementById("e-buyer").innerHTML = fpc(pc(E.consResp,E.enqResp));
+  document.getElementById("e-buyern").textContent = fnum(E.consResp)+" of "+fnum(E.enqResp)+" with a seller response";
+  document.getElementById("e-chat").innerHTML = fpc(pc(E.consChat,E.onPlat));
+  document.getElementById("e-chatn").textContent = fnum(E.consChat)+" of "+fnum(E.onPlat)+" on-platform";
+  document.getElementById("e-sess").textContent = fnum(E.sessions);
+  document.getElementById("e-median").textContent = Math.round(E.medianReply)+" min";
+
+  // --- after the send ---
+  const A = AFTER[win];
+  let arows="";
+  [["Push","push","push"],["SMS","sms","sms"]].forEach(([lbl,key,cls])=>{
+    const a=A[key];
+    arows += `<tr><td><span class="pill ${cls}">${lbl}</span></td><td>${fnum(a.send)}</td><td>${fnum(a.eligible)}</td>
+      <td>${fnum(a.session)}</td><td>${fpc(pc(a.session,a.eligible))}</td><td>${fnum(a.message)}</td><td>${fpc(pc(a.message,a.eligible))}</td></tr>`;
+  });
+  arows += `<tr class="total"><td>Email</td><td colspan="6" class="l blocked">feed stopped populating outcomes on 27 Aug &mdash; see below</td></tr>`;
+  document.getElementById("afterRows").innerHTML=arows;
+  document.getElementById("afterNote").innerHTML =
+    `Over ${A.label}, ${fpc(pc(A.push.session,A.push.eligible))} of push recipients came back to the site or app within 7 days and ${fpc(pc(A.push.message,A.push.eligible))} went on to send a message. SMS returns ${fpc(pc(A.sms.session,A.sms.eligible))} and ${fpc(pc(A.sms.message,A.sms.eligible))}. The gap is widest on the metric that matters most &mdash; buyers actually messaging.`;
+}
+
+function drawWeekChart(){
+  const W=680,H=210,pad={l:44,r:14,t:12,b:44};
+  const iw=W-pad.l-pad.r, ih=H-pad.t-pad.b;
+  const n=ENQ_WEEKS.length, bw=iw/n;
+  const y=v=>pad.t+ih-(v/30)*ih;
+  let grid="",bars="",labs="";
+  [0,10,20,30].forEach(v=>{
+    grid+=`<line x1="${pad.l}" x2="${pad.l+iw}" y1="${y(v)}" y2="${y(v)}" stroke="${cssv("--line-soft")}" stroke-width="1"></line>`;
+    grid+=`<text x="${pad.l-8}" y="${y(v)+4}" text-anchor="end" font-size="11" fill="${cssv("--ink-3")}" font-family="IBM Plex Mono,monospace">${v}%</text>`;
+  });
+  ENQ_WEEKS.forEach(([lbl,base,resp],i)=>{
+    const r=100*resp/base, x=pad.l+i*bw+bw*0.18, w=bw*0.64;
+    const last = i===n-1;
+    bars+=`<rect x="${x}" y="${y(r)}" width="${w}" height="${Math.max(pad.t+ih-y(r),1)}" rx="4" fill="${last?cssv("--line"):cssv("--accent")}"></rect>`;
+    labs+=`<text x="${x+w/2}" y="${y(r)-7}" text-anchor="middle" font-size="12" font-weight="600" fill="${cssv("--ink")}" font-family="Archivo,sans-serif">${r.toFixed(1)}%</text>`;
+    labs+=`<text x="${x+w/2}" y="${H-24}" text-anchor="middle" font-size="11" fill="${cssv("--ink-3")}" font-family="Archivo,sans-serif">${lbl}</text>`;
+    if(last) labs+=`<text x="${x+w/2}" y="${H-9}" text-anchor="middle" font-size="10.5" fill="${cssv("--ink-3")}" font-family="Archivo,sans-serif">2 days, still maturing</text>`;
+  });
+  document.getElementById("weekChart").innerHTML =
+    `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Buyer response rate by week, falling toward the present as recent enquiries have had less time to mature">${grid}${bars}${labs}</svg>`;
 }
 
 /* ---------------- charts ---------------- */
-function drawReach(entries,pushU,smsU,neither){
-  const W=700,H=120,pad={l:0,r:0,t:26,b:34};
-  const iw=W;
-  const seg=[["Push",pushU,cssv("--push")],["SMS",smsU,cssv("--sms")],["Neither",neither,cssv("--line")]];
-  let x=0,bars="",labels="";
-  seg.forEach(([n,v,c])=>{
-    const w=entries? iw*v/entries : 0;
-    bars += `<rect x="${x+1}" y="${pad.t}" width="${Math.max(w-2,0)}" height="34" rx="4" fill="${c}"></rect>`;
-    if(w>66){
-      labels += `<text x="${x+w/2}" y="${pad.t+22}" text-anchor="middle" font-size="13" font-weight="600" fill="${n==="Neither"?cssv("--ink-2"):"#fff"}" font-family="Archivo,sans-serif">${(100*v/entries).toFixed(1)}%</text>`;
-    }
-    labels += `<text x="${Math.min(x+w/2,iw-24)}" y="${pad.t+52}" text-anchor="middle" font-size="12" fill="${cssv("--ink-3")}" font-family="Archivo,sans-serif">${n} &middot; ${v.toLocaleString("en-GB")}</text>`;
-    x+=w;
-  });
-  const svg = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Share of journey entries reached by push, SMS or neither">
-    <text x="0" y="14" font-size="12" fill="${cssv("--ink-3")}" font-family="Archivo,sans-serif">All ${entries.toLocaleString("en-GB")} entries received an email &middot; push and SMS split the remainder</text>
-    <rect x="0" y="${pad.t}" width="${iw}" height="34" rx="4" fill="${cssv("--line-soft")}"></rect>
-    ${bars}${labels}
-  </svg>`;
-  document.getElementById("reachChart").innerHTML=svg;
-}
-
 function comboChart(el,data,accent,rateLabel,markIdx){
   const W=560,H=250,pad={l:44,r:16,t:14,b:38};
   const iw=W-pad.l-pad.r, ih=H-pad.t-pad.b;
@@ -753,6 +917,7 @@ tabs.forEach(([t,p])=>{
 
 /* ---------------- boot ---------------- */
 render("d30");
+drawWeekChart();
 buildArchive();
 buildTimeline("tlSms",TL_SMS);
 buildTimeline("tlEmail",TL_EMAIL);
