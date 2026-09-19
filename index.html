@@ -97,6 +97,8 @@ td.blocked{color:var(--ink-3);font-style:italic}
 .pill.wa{background:var(--blocked-bg);color:var(--ink-2)}
 .pill.sig{background:var(--crit-bg);color:var(--crit)}
 .pill.ns{background:var(--blocked-bg);color:var(--ink-3)}
+.pill.warnp{background:var(--warn-bg);color:var(--warn)}
+.pathnote{display:inline-block;font-size:12px;color:var(--ink-3);line-height:1.45;margin-top:3px;max-width:34ch}
 
 /* callouts */
 .callout{border-radius:10px;padding:14px 16px;font-size:14px;display:flex;flex-direction:column;gap:7px;border:1px solid}
@@ -208,13 +210,13 @@ figure.tl-fig figcaption{padding:9px 12px;font-size:12px;color:var(--ink-3);bord
       <p class="note" id="winNote"></p>
 
       <div class="tiles">
-        <div class="tile"><span class="k">Buyers reached, any channel</span><span class="v num">996</span><span class="s">last 30 days, warehouse</span></div>
-        <div class="tile ch-email"><span class="k">Reached by email</span><span class="v num">98.5%</span><span class="s">981 buyers</span></div>
-        <div class="tile ch-push"><span class="k">Reached by push</span><span class="v num">40.1%</span><span class="s">399 buyers</span></div>
-        <div class="tile ch-sms"><span class="k">Reached by SMS</span><span class="v num">38.8%</span><span class="s">386 buyers</span></div>
-        <div class="tile"><span class="k">Neither push nor SMS</span><span class="v num">29.1%</span><span class="s">290 buyers, email only</span></div>
+        <div class="tile"><span class="k">Buyers reached, any channel</span><span class="v num" id="r-total">&mdash;</span><span class="s" id="r-totaln"></span></div>
+        <div class="tile ch-email"><span class="k">Reached by email</span><span class="v num" id="r-emailpc">&mdash;</span><span class="s" id="r-emailn"></span></div>
+        <div class="tile ch-push"><span class="k">Reached by push</span><span class="v num" id="r-pushpc">&mdash;</span><span class="s" id="r-pushn"></span></div>
+        <div class="tile ch-sms"><span class="k">Reached by SMS</span><span class="v num" id="r-smspc">&mdash;</span><span class="s" id="r-smsn"></span></div>
+        <div class="tile"><span class="k">Neither push nor SMS</span><span class="v num" id="r-neitherpc">&mdash;</span><span class="s" id="r-neithern"></span></div>
       </div>
-      <p class="footnote">Tiles are the full 30-day window from the warehouse send logs, where true distinct-buyer counts and channel overlap are available. The table below follows the window switch and uses Iterable's live-campaign figures.</p>
+      <p class="footnote">Tiles are deduplicated distinct-buyer counts from the warehouse send logs, so they account for buyers reached on more than one channel. The table below uses Iterable's live-campaign figures, which count messages.</p>
 
       <div class="tw">
         <table>
@@ -244,19 +246,11 @@ figure.tl-fig figcaption{padding:9px 12px;font-size:12px;color:var(--ink-3);bord
 
     <div class="block">
       <h2>Channel overlap</h2>
-      <p class="note">Distinct buyers by the combination of channels they received, 19 Aug &ndash; 17 Sep. Source: the three warehouse send logs.</p>
+      <p class="note" id="overlapNote"></p>
       <div class="tw">
         <table>
-          <thead><tr><th>Channels received</th><th>Distinct buyers</th><th>Share of 996 reached</th></tr></thead>
-          <tbody>
-            <tr><td>Email + push</td><td>316</td><td>31.7%</td></tr>
-            <tr><td>Email + SMS</td><td>296</td><td>29.7%</td></tr>
-            <tr><td>Email only</td><td>290</td><td>29.1%</td></tr>
-            <tr><td><strong>Email + push + SMS</strong></td><td><strong>79</strong></td><td><strong>7.9%</strong></td></tr>
-            <tr><td>SMS only</td><td>11</td><td>1.1%</td></tr>
-            <tr><td>Push only</td><td>4</td><td>0.4%</td></tr>
-            <tr><td>Push + SMS, no email</td><td>0</td><td>0%</td></tr>
-          </tbody>
+          <thead><tr><th>Channels received</th><th>Distinct buyers</th><th>Share</th><th>Pathway</th></tr></thead>
+          <tbody id="overlapRows"></tbody>
         </table>
       </div>
       <div class="callout crit">
@@ -264,7 +258,7 @@ figure.tl-fig figcaption{padding:9px 12px;font-size:12px;color:var(--ink-3);bord
         <p><strong>79 buyers received both push and SMS</strong> in the 30-day window, not the 3 found in the 26 Aug spot check. That is 7.9% of everyone the journey reached, and roughly one in five of everyone who got an SMS. Every one of them also received an email, so a meaningful slice of buyers is getting three notifications for the same seller message.</p>
         <p>This is period-level overlap rather than proof of the race condition on its own &mdash; confirming that needs each buyer's push and SMS timestamps checked against the same trigger. But it moves the 10-minute push-check delay from a tidy-up to the highest-value fix on this journey, and it is worth costing: 79 buyers over 30 days is 79 avoidable SMS.</p>
       </div>
-      <p class="footnote">Only 15 buyers (1.5%) received push or SMS without an email, which supports the 26 Aug finding that essentially everyone entering the journey gets an email.</p>
+      <p class="footnote" id="overlapFoot"></p>
     </div>
 
     <div class="block">
@@ -311,26 +305,30 @@ figure.tl-fig figcaption{padding:9px 12px;font-size:12px;color:var(--ink-3);bord
 
     <div class="block">
       <h2>SMS eligibility</h2>
+      <p class="note">Your definition is SMS sent &divide; (triggered the event, push not sent, phone number on file, SMS opted in, not suppressed by the 18-hour rule). Four of the five conditions now have a number against them.</p>
+
       <div class="tw">
         <table>
-          <thead><tr><th>Eligibility condition</th><th>Status</th><th>Source</th></tr></thead>
+          <thead><tr><th>Eligibility condition</th><th>Buyers</th><th>Source</th></tr></thead>
           <tbody>
-            <tr><td>Triggered <span class="mono">chatMessageCreated</span> (receiver &ne; professional)</td><td class="blocked">not available</td><td class="l">Iterable custom events &mdash; still not exposed</td></tr>
-            <tr><td>&hellip; and push was not sent</td><td style="color:var(--good);font-weight:600">now computable</td><td class="l"><span class="mono">push_log_iterable</span> &mdash; access restored 18 Sep</td></tr>
-            <tr><td>&hellip; and has a phone number on file</td><td style="color:var(--good);font-weight:600">now computable</td><td class="l"><span class="mono">buyer_user.phone_number_formatted</span></td></tr>
-            <tr><td>&hellip; and is SMS opted in</td><td class="blocked">no field found</td><td class="l">&mdash;</td></tr>
-            <tr><td>&hellip; and triggered only once in any rolling 18h window<br><span style="font-size:12px;color:var(--ink-3)">Largely neutralised from 16 Sep &mdash; the message preview makes consecutive SMS non-identical</span></td><td class="blocked">not available</td><td class="l">needs the event stream</td></tr>
-            <tr class="total"><td>Eligible, and actually sent an SMS</td><td class="blocked">blocked on 2 of 5 conditions</td><td class="l">&mdash;</td></tr>
+            <tr><td>Triggered the chat message event, SMS opted in, phone number on file</td><td><strong id="smsPool">&mdash;</strong></td><td class="l">Iterable segments <a href="https://app.iterable.com/segmentation?emailListId=10772867" target="_blank" rel="noopener">10772867</a> (30d) / <a href="https://app.iterable.com/segmentation?emailListId=11149315" target="_blank" rel="noopener">11149315</a> (7d)</td></tr>
+            <tr><td>&hellip; and push was not sent</td><td class="blocked">computable, not yet run</td><td class="l"><span class="mono">push_log_iterable</span> &mdash; access restored 18 Sep</td></tr>
+            <tr><td>&hellip; and not suppressed by the 18-hour duplicate rule<br><span class="pathnote">Largely neutralised from 16 Sep &mdash; the message preview makes consecutive SMS non-identical</span></td><td class="blocked">not available</td><td class="l">Needs the chat message event stream</td></tr>
+            <tr class="total"><td>Distinct buyers actually sent an SMS</td><td id="smsSent">&mdash;</td><td class="l">Warehouse <span class="mono">sms_log_iterable</span></td></tr>
+            <tr class="total"><td>Reach against the opted-in, contactable pool</td><td id="smsPoolPc">&mdash;</td><td class="l" id="smsPoolCalc"></td></tr>
           </tbody>
         </table>
       </div>
+
+      <div class="callout warn">
+        <h4>About a third of the contactable pool isn't getting an SMS</h4>
+        <p id="smsGap"></p>
+        <p>That query is the single most useful next number on this journey &mdash; it turns "SMS sends look low" into either "working as designed" or a specific count of buyers who fell through. It is now computable from <span class="mono">push_log_iterable</span>.</p>
+      </div>
+
       <div class="callout info">
-        <h4>Two asks left for data eng, down from four</h4>
-        <ul>
-          <li>Expose the Iterable custom-event stream with <span class="mono">chatMessageCreated</span>, its <span class="mono">receiver</span> field, buyer identity and UTC timestamp. This is the blocker for the whole "expected" side.</li>
-          <li>A point-in-time buyer SMS consent field. <span class="mono">buyer_notify_email_eligible</span> is email eligibility and must not be used as SMS consent.</li>
-        </ul>
-        <p>Warehouse access to the three send logs and to phone-number state is resolved. Worth updating <a href="https://barkdev.atlassian.net/browse/IST-6640" target="_blank" rel="noopener">IST-6640</a> rather than raising fresh.</p>
+        <h4>One ask left for data eng</h4>
+        <p>Expose the Iterable custom-event stream with <span class="mono">chatMessageCreated</span>, its <span class="mono">receiver</span> field, buyer identity and UTC timestamp. That is now the only blocker on this journey: it unlocks the true "messages sent" denominator for every delivery rate, and the 18-hour suppression check. Warehouse access to the send logs, phone-number state and the SMS opt-in pool are all resolved. Worth updating <a href="https://barkdev.atlassian.net/browse/IST-6640" target="_blank" rel="noopener">IST-6640</a> rather than raising fresh.</p>
       </div>
     </div>
 
@@ -381,31 +379,11 @@ figure.tl-fig figcaption{padding:9px 12px;font-size:12px;color:var(--ink-3);bord
     </div>
 
     <div class="block">
-      <h2>Metric coverage</h2>
-      <p class="note">Your spec, against what the report can currently show.</p>
-      <div class="tw">
-        <table>
-          <thead><tr><th>Requested metric</th><th>Status</th><th>Where it is</th></tr></thead>
-          <tbody>
-            <tr><td>Email delivery rate = (sends &minus; bounces) &divide; messages sent</td><td class="l"><span class="pill live">Actual side in</span></td><td class="l">Delivery table. Denominator blocked.</td></tr>
-            <tr><td>Push / SMS delivery = received &divide; messages sent</td><td class="l"><span class="pill live">Actual side in</span></td><td class="l">Delivery table. Denominator blocked.</td></tr>
-            <tr><td>SMS = sent &divide; (messages sent, push not sent, phone on file)</td><td class="l"><span class="pill off">3 of 5 conditions</span></td><td class="l">SMS eligibility table</td></tr>
-            <tr><td>Received one of the above</td><td class="l"><span class="pill live">In</span></td><td class="l">Tiles and delivery table</td></tr>
-            <tr><td>Returned to inbox app or web after receiving</td><td class="l"><span class="pill live">In</span></td><td class="l">After the send</td></tr>
-            <tr><td>Messages sent after receiving</td><td class="l"><span class="pill live">In</span></td><td class="l">After the send</td></tr>
-            <tr><td>Clicks, opens, unsubs, bounces</td><td class="l"><span class="pill live">In</span></td><td class="l">Email, Push and SMS tables</td></tr>
-            <tr><td>Response rate and sessions</td><td class="l"><span class="pill live">In</span></td><td class="l">Marketplace response rate and sessions</td></tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-
-    <div class="block">
       <h2>Daily trend</h2>
       <div class="chart-grid">
         <div class="chart">
           <h3>Email: sends and open rate</h3>
-          <p class="sub">Comm #1, both opt-in variants combined (19381134 + 19381812). 14 Aug &ndash; 10 Sep.</p>
+          <p class="sub">Comm #1, both opt-in variants combined (19381134 + 19381812). 14 Aug &ndash; 10 Sep. The marker is 17 Aug, when machine-open tracking started under-reporting.</p>
           <div class="legend"><span><i style="background:var(--email)"></i>Open rate</span><span><i style="background:var(--line);border:1px solid var(--ink-3)"></i>Sends</span></div>
           <div id="emailChart"></div>
         </div>
@@ -572,7 +550,17 @@ const M = {
 // Includes the control campaigns that were live until 2 Sep, so email exceeds the live-campaign totals above.
 const WAREHOUSE = {email:{msgs:3798,buyers:981}, push:{msgs:1663,buyers:399}, sms:{msgs:544,buyers:386}};
 // 30-day channel overlap, distinct buyers (warehouse send logs, non-skipped, buyer_user_id not null)
-const OVERLAP = {emailOnly:290, pushOnly:4, smsOnly:11, emailPush:316, emailSms:296, pushSms:0, all:79};
+const OVERLAP = {
+  d30:{total:996, emailPush:316, emailSms:296, emailOnly:290, all:79, pushSms:0, smsOnly:11, pushOnly:4},
+  d7 :{total:265, emailPush:88,  emailSms:71,  emailOnly:84,  all:19, pushSms:0, smsOnly:3,  pushOnly:0}
+};
+// Deduplicated distinct buyers reached, warehouse send logs
+const REACH = {
+  d30:{total:996, email:981, push:399, sms:386, neither:290},
+  d7 :{total:265, email:262, push:107, sms:93,  neither:84}
+};
+// Iterable segments: triggered the chat message event, SMS opted in, phone number on file
+const SMS_POOL = {d30:604, d7:187};
 // insight_reporting.crm_sms_push_whatsapp, attribution_mode = any_7d_post_send
 const AFTER = {
   d30:{label:"19 Aug - 17 Sep",
@@ -734,6 +722,49 @@ function render(win){
   const smsU  = M[16985565][win].uDeliv;
   const neither = Math.max(entries - pushU - smsU, 0);
 
+  const R = REACH[win];
+  document.getElementById("r-total").textContent = fnum(R.total);
+  document.getElementById("r-totaln").textContent = E.label;
+  [["email","r-email"],["push","r-push"],["sms","r-sms"]].forEach(([k,id])=>{
+    document.getElementById(id+"pc").innerHTML = fpc(pc(R[k],R.total));
+    document.getElementById(id+"n").textContent = fnum(R[k])+" buyers";
+  });
+  document.getElementById("r-neitherpc").innerHTML = fpc(pc(R.neither,R.total));
+  document.getElementById("r-neithern").textContent = fnum(R.neither)+" buyers, email only";
+
+  const O = OVERLAP[win];
+  const OROWS = [
+    ["Email + push",      O.emailPush, "ok",  ""],
+    ["Email + SMS",       O.emailSms,  "ok",  ""],
+    ["Email only",        O.emailOnly, "bad", "Points to an error on the push or SMS send &mdash; neither reached the buyer."],
+    ["Email + push + SMS",O.all,       "bad", "The push send didn't register in time, so an SMS went out as well."],
+    ["SMS + push, no email", O.pushSms,"bad", "Same push timing issue. Email may simply not have sent because the buyer is unsubscribed."],
+    ["SMS only",          O.smsOnly,   "na",  "Email may not have sent because the buyer is unsubscribed."],
+    ["Push only",         O.pushOnly,  "na",  "Email may not have sent because the buyer is unsubscribed."]
+  ];
+  document.getElementById("overlapNote").innerHTML =
+    `Distinct buyers by the combination of channels they received, <strong>${E.label}</strong>. Source: the three warehouse send logs.`;
+  document.getElementById("overlapRows").innerHTML = OROWS.map(([lbl,v,kind,note])=>{
+    const em = lbl==="Email + push + SMS";
+    const pill = kind==="ok" ? '<span class="pill live">As designed</span>'
+               : kind==="bad" ? '<span class="pill warnp">Not ideal</span>' : "";
+    return `<tr><td>${em?`<strong>${lbl}</strong>`:lbl}</td><td>${em?`<strong>${fnum(v)}</strong>`:fnum(v)}</td>
+      <td>${em?`<strong>${fpc(pc(v,O.total))}</strong>`:fpc(pc(v,O.total))}</td>
+      <td class="l">${pill}${pill&&note?"<br>":""}${note?`<span class="pathnote">${note}</span>`:""}</td></tr>`;
+  }).join("");
+  const notIdeal = O.emailOnly + O.all + O.pushSms;
+  document.getElementById("overlapFoot").innerHTML =
+    `The three not-ideal pathways account for <strong>${fnum(notIdeal)} buyers, ${fpc(pc(notIdeal,O.total))}</strong> of everyone the journey reached. Only ${fnum(O.smsOnly+O.pushOnly+O.pushSms)} buyers received push or SMS without an email, which supports the 26 Aug finding that essentially everyone entering the journey gets an email.`;
+
+  // SMS eligibility pool
+  const pool = SMS_POOL[win], smsBuyers = REACH[win].sms;
+  document.getElementById("smsPool").textContent = fnum(pool);
+  document.getElementById("smsSent").innerHTML = "<strong>"+fnum(smsBuyers)+"</strong>";
+  document.getElementById("smsPoolPc").innerHTML = "<strong>"+fpc(pc(smsBuyers,pool))+"</strong>";
+  document.getElementById("smsPoolCalc").textContent = smsBuyers+" \u00f7 "+pool;
+  document.getElementById("smsGap").innerHTML =
+    `Of the ${fnum(pool)} buyers who triggered the event, are SMS opted in and have a phone number on file, <strong>${fnum(smsBuyers)} (${fpc(pc(smsBuyers,pool))}) received an SMS</strong> over ${E.label}. Some of that gap is correct behaviour &mdash; those buyers got a push instead, which is the intended path. The rest is the shortfall you and Ailish have been chasing. Splitting it needs one query: of the ${fnum(pool-smsBuyers)} who didn't get an SMS, how many had a push delivered.`;
+
   const share = {email:"100%", push:fpc(pc(pushU,entries)), sms:fpc(pc(smsU,entries))};
   const label = {email:"Email", push:"Push", sms:"SMS"};
   let rows="";
@@ -839,7 +870,7 @@ function drawWeekChart(){
 }
 
 /* ---------------- charts ---------------- */
-function comboChart(el,data,accent,rateLabel,markIdx){
+function comboChart(el,data,accent,rateLabel,markIdx,markLabel,markRight){
   const W=560,H=250,pad={l:44,r:16,t:14,b:38};
   const iw=W-pad.l-pad.r, ih=H-pad.t-pad.b;
   const maxSend=Math.max(...data.map(d=>d[1]));
@@ -865,8 +896,10 @@ function comboChart(el,data,accent,rateLabel,markIdx){
   let mark="";
   if(markIdx!==undefined){
     const mx=pad.l+markIdx*bw;
+    const anchor = markRight ? "start" : "end";
+    const tx = markRight ? mx+6 : mx-6;
     mark=`<line x1="${mx}" x2="${mx}" y1="${pad.t}" y2="${pad.t+ih}" stroke="${cssv("--crit")}" stroke-width="1.5" stroke-dasharray="4 3"></line>
-          <text x="${mx-6}" y="${pad.t+12}" text-anchor="end" font-size="10.5" fill="${cssv("--crit")}" font-family="Archivo,sans-serif">quiet hours off</text>`;
+          <text x="${tx}" y="${pad.t+12}" text-anchor="${anchor}" font-size="10.5" fill="${cssv("--crit")}" font-family="Archivo,sans-serif">${markLabel||""}</text>`;
   }
   el.innerHTML=`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${rateLabel} by day with daily send volume"><rect x="0" y="0" width="${W}" height="${H}" fill="none"></rect>${grid}${bars}${mark}<path d="${line}" fill="none" stroke="${accent}" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"></path>${dots}${xlab}</svg>`;
 }
@@ -921,8 +954,8 @@ drawWeekChart();
 buildArchive();
 buildTimeline("tlSms",TL_SMS);
 buildTimeline("tlEmail",TL_EMAIL);
-comboChart(document.getElementById("emailChart"),DAILY_EMAIL,cssv("--email"),"Email open rate");
-comboChart(document.getElementById("smsChart"),DAILY_SMS,cssv("--sms"),"SMS click rate",7);
+comboChart(document.getElementById("emailChart"),DAILY_EMAIL,cssv("--email"),"Email open rate",3,"machine opens affected",true);
+comboChart(document.getElementById("smsChart"),DAILY_SMS,cssv("--sms"),"SMS click rate",7,"quiet hours off",false);
 </script>
 
 </body>
