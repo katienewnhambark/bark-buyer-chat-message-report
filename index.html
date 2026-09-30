@@ -296,7 +296,7 @@ figure.tl-fig figcaption{padding:9px 12px;font-size:12px;color:var(--ink-3);bord
       <div class="callout crit">
         <h4>SMS click rate is still not measuring humans</h4>
         <p id="smsWarn"></p>
-        <p>Iterable are checking whether bot-filtering regressed on this campaign: every SMS click event carries an <span class="mono">isBot</span> flag, and the filtered figure excludes flagged clicks. Since 11 Sep the filtered and unfiltered figures have converged, which is the opposite of what a working filter looks like. Do not report SMS click rate in any weekly summary until they come back.</p>
+        <p><strong>Confirmed 30 Sep:</strong> the fault is bot <em>detection</em>, not a filter that stopped running. Spot checks found click events recorded as <span class="mono">isBot = false</span> that are actually bots. Because the filtered metric works by excluding events flagged <span class="mono">isBot = true</span>, anything mislabelled false passes straight through it &mdash; so the filtered figure is not a safe fallback either. Do not report SMS click rate in any weekly summary, in either form, until Iterable rectify the detection.</p>
         <p><strong>The rebuild answered one question.</strong> The from-scratch duplicate (<a href="https://app.iterable.com/campaigns/19984008" target="_blank" rel="noopener">19984008</a>) has run six days at <strong>97.0%</strong> &mdash; 65 clickers from 67 delivered. Whatever is inflating clicks is not campaign-specific state, so rebuilding campaigns will not fix it. That narrows it to click tracking or link handling, which is where Iterable should be pointed.</p>
       </div>
     </div>
@@ -493,7 +493,7 @@ figure.tl-fig figcaption{padding:9px 12px;font-size:12px;color:var(--ink-3);bord
 
       <details class="fold" id="previewTest" open>
         <summary>
-          <span class="fold-title"><span class="t">Message preview A/B test</span><span class="s">Email 1 and Email 2 reminder &middot; preview vs no preview &middot; started 29 Sep 2026 &middot; partially live</span></span>
+          <span class="fold-title"><span class="t">Message preview A/B test</span><span class="s">Email 1 and Email 2 reminder &middot; preview vs no preview &middot; all three cells live from 29 Sep 2026</span></span>
           <span class="chev" aria-hidden="true"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9.5 12 15.5 18 9.5"/></svg></span>
         </summary>
         <div class="fold-body">
@@ -701,7 +701,12 @@ const TL_SMS = [
    "Campaign <a href='https://app.iterable.com/campaigns/16985565' target='_blank' rel='noopener'>16985565</a> has sent nothing since 23 Sep. All SMS 1 volume now runs through <a href='https://app.iterable.com/campaigns/19984008' target='_blank' rel='noopener'>19984008</a>, so the rebuilt campaign replaced the original rather than running alongside it. Total volume is unchanged, which is why the two campaigns have to be read together.",
    "The near-100% click rate survived the rebuild: 19984008 is at 97% over its first six days. That rules out campaign-level state as the cause and points back at click tracking, which is where Iterable are looking.",
    "<strong>The eligibility gap is still open.</strong> 356 buyers received an SMS against 556 in the eligible segment over 30 days. If the casing was the main blocker, volume should have moved; it didn't, so either the fix isn't reaching the buyers it was meant to, or something earlier in the journey is filtering them out first. Worth a spot check on named buyers who carry only <span class='mono'>phoneNumber</span> and still didn't receive an SMS after 23 Sep.",
-   "Correction to the 22 Sep note: 19984008 <em>does</em> carry the <span class='mono'>buyer_chat_notification</span> label, in both <span class='mono'>iterable.campaign</span> and its SMS log rows, so reporting was never missing it. What a campaign_group filter does miss in this workflow is 31 emails to 1 buyer and 4 pushes to 4 buyers from other unlabelled campaigns."]]
+   "Correction to the 22 Sep note: 19984008 <em>does</em> carry the <span class='mono'>buyer_chat_notification</span> label, in both <span class='mono'>iterable.campaign</span> and its SMS log rows, so reporting was never missing it. What a campaign_group filter does miss in this workflow is 31 emails to 1 buyer and 4 pushes to 4 buyers from other unlabelled campaigns."]],
+ ["30 Sep 2026","Bot detection confirmed faulty: clicks flagged isBot = false are bots",
+  ["<strong>The problem is misclassification, not a filter that stopped running.</strong> Spot checks on SMS click events found clicks recorded as <span class='mono'>isBot = false</span> that are in fact bot traffic. Iterable's detection is labelling them wrongly at the point the event is written.",
+   "That means <strong>the filtered click rate is not a safe fallback</strong>. The filtered metric works by excluding events flagged <span class='mono'>isBot = true</span>, so anything mislabelled false passes straight through it. Both the filtered and unfiltered figures are carrying bot clicks, and neither should be reported until this is fixed.",
+   "It also explains the two things that didn't previously add up: why filtered and unfiltered converged from 11 Sep instead of separating, and why rebuilding the campaign from scratch on 22 Sep made no difference &mdash; a clean campaign inherits the same faulty detection.",
+   "Katie is working with Iterable on how they intend to rectify the detection and whether historic events can be re-scored. Until they come back, treat SMS click rate on this journey as unusable in either form, and read SMS performance on delivery and on the downstream session and message metrics instead."]]
 ];
 
 const TL_EMAIL = [
