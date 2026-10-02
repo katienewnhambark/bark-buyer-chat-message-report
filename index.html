@@ -178,7 +178,7 @@ figure.tl-fig figcaption{padding:9px 12px;font-size:12px;color:var(--ink-3);bord
     <div>
       <div class="eyebrow">Iterable workflow 643021 &middot; project 8947</div>
       <h1>Buyer &mdash; Seller Sent Message</h1>
-      <p class="lede">Send monitoring for the buyer chat-notification journey: what reaches buyers on each channel, what we're testing, and what changed. Figures pulled live from Iterable, the warehouse and Tableau on <span class="mono">28 Sep 2026</span>.</p>
+      <p class="lede">Send monitoring for the buyer chat-notification journey: what reaches buyers on each channel, what we're testing, and what changed. Figures pulled live from Iterable, the warehouse and Tableau on <span class="mono">2 Oct 2026</span>.</p>
     </div>
     <div class="meta-links">
       <a href="https://app.iterable.com/workflows/643021/edit?mode=beta&amp;workflowType=Published&amp;projectId=8947" target="_blank" rel="noopener">Published journey in Iterable &rarr;</a>
@@ -382,13 +382,13 @@ figure.tl-fig figcaption{padding:9px 12px;font-size:12px;color:var(--ink-3);bord
       <div class="chart-grid">
         <div class="chart">
           <h3>Email: sends and open rate</h3>
-          <p class="sub">Comm #1, both opt-in variants combined (19381134 + 19381812). 29 Aug &ndash; 27 Sep. The 17 Aug machine-opens break now sits before this window, so everything here is on the same footing.</p>
+          <p class="sub">Comm #1, all four campaigns combined (19381134 + 19381812 + the two test variants). 2 Sep &ndash; 1 Oct. The 17 Aug machine-opens break now sits before this window, so everything here is on the same footing.</p>
           <div class="legend"><span><i style="background:var(--email)"></i>Open rate</span><span><i style="background:var(--line);border:1px solid var(--ink-3)"></i>Sends</span></div>
           <div id="emailChart"></div>
         </div>
         <div class="chart">
           <h3>SMS: click rate</h3>
-          <p class="sub">SMS 1, both campaigns combined (16985565 + 19984008). 29 Aug &ndash; 27 Sep. Markers: quiet hours removed 8 Sep, phone-property casing fixed 23 Sep.</p>
+          <p class="sub">SMS 1, all three campaigns combined (16985565 + 19984008 + 20110136). 2 Sep &ndash; 1 Oct. Markers: quiet hours removed 8 Sep, SMS moved to its own workflow 30 Sep.</p>
           <div class="legend"><span><i style="background:var(--sms)"></i>Click rate</span><span><i style="background:var(--line);border:1px solid var(--ink-3)"></i>Sends</span></div>
           <div id="smsChart"></div>
         </div>
@@ -528,6 +528,33 @@ figure.tl-fig figcaption{padding:9px 12px;font-size:12px;color:var(--ink-3);bord
           </div>
           <p class="footnote">Control is the live creative rendered from Iterable template <span class="mono">25339375</span>. Test is rendered live from Iterable template <span class="mono">26524362</span>. The Email 2 reminder test (<span class="mono">26524669</span>) applies the same change and is not shown separately. Brand imagery hosted on Iterable&rsquo;s asset library could not be fetched into this environment, so logo, icons, QR and store badges appear as placeholders &mdash; layout, copy and CTAs are the real thing.</p>
 
+          <h3 class="fold-h">First read &mdash; 29 Sep to 1 Oct</h3>
+          <p class="note">Three days. Rates are per unique recipient. Differences checked with two-proportion z-tests; significance noted only where a difference reached it.</p>
+          <div class="tw">
+            <table>
+              <thead><tr><th>Cell</th><th>Recipients</th><th>Open rate</th><th>Click rate</th><th>Open change</th><th>Click change</th><th class="l">Result</th></tr></thead>
+              <tbody>
+                <tr><td><strong>Marketing opt-in</strong><br><span class="mono" style="font-size:11.5px;color:var(--ink-3)">19381134 vs 20109309</span></td><td>32 / 22</td><td>81.2% &rarr; 50.0%</td><td>43.8% &rarr; 13.6%</td><td><strong>&minus;31.2pp</strong></td><td><strong>&minus;30.1pp</strong></td><td style="text-align:left"><strong>Decrease on both &mdash; statistically significant</strong></td></tr>
+                <tr><td><strong>Transactional only</strong><br><span class="mono" style="font-size:11.5px;color:var(--ink-3)">19381812 vs 20109353</span></td><td>77 / 59</td><td>53.2% &rarr; 45.8%</td><td>27.3% &rarr; 23.7%</td><td>&minus;7.5pp</td><td>&minus;3.5pp</td><td style="text-align:left">Decrease on both</td></tr>
+                <tr><td><strong>Email 2 reminder</strong><br><span class="mono" style="font-size:11.5px;color:var(--ink-3)">19381863 vs 20109511</span></td><td>6 / 3</td><td colspan="4" class="l blocked">too few recipients to read</td><td style="text-align:left" class="blocked">&mdash;</td></tr>
+                <tr class="total"><td>Pooled</td><td>109 / 81</td><td>61.5% &rarr; 46.9%</td><td>32.1% &rarr; 21.0%</td><td><strong>&minus;14.6pp</strong></td><td>&minus;11.1pp</td><td style="text-align:left"><strong>Open rate decrease &mdash; statistically significant</strong></td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="callout crit">
+            <h4>Open rate should not be moving, and that is the finding</h4>
+            <p>The message preview sits in the email body. A buyer has to open the email before they can see whether it is there, so removing it <strong>cannot</strong> change open rate. Yet open rate is down 31.2pp in the marketing cell and 14.6pp pooled, both statistically significant. A creative change that is invisible at the moment of opening cannot produce that, so something other than the creative is driving it.</p>
+            <p>Two candidates worth checking before any click-rate reading is trusted. <strong>Assignment:</strong> the split is running 59% / 41% to control in the marketing cell and 57% / 43% in transactional, not 50/50, which suggests buyers are not being allocated evenly and may not be comparable. <strong>Tracking:</strong> the test templates were pasted in fresh, so it is worth confirming the open pixel survived the edit &mdash; a missing or altered pixel would depress opens on the test arm regardless of buyer behaviour.</p>
+            <p>Until one of those is ruled out, treat the click-rate numbers as unreadable too: they share the same denominator and the same assignment.</p>
+          </div>
+
+          <div class="callout info">
+            <h4>Where this leaves the test</h4>
+            <p>Three days and 190 recipients is far too early for a verdict on the hypothesis either way, so nothing here should be read as the preview winning or losing. The useful output of this first read is the open-rate anomaly, which is a setup problem to fix rather than a result to interpret.</p>
+            <p>Once the split and the pixel are confirmed, restart the clock from that date rather than from 29 Sep &mdash; data collected under an uneven or mistracked split should not be pooled with what comes after.</p>
+          </div>
+
 
 
 
@@ -568,78 +595,91 @@ figure.tl-fig figcaption{padding:9px 12px;font-size:12px;color:var(--ink-3);bord
 
 <script>
 /* ---------------- data ---------------- */
-// Iterable campaign metrics. d30 = 29 Aug-27 Sep 2026, d7 = 21-27 Sep 2026.
+// Iterable campaign metrics. d30 = 2 Sep-1 Oct 2026, d7 = 25 Sep-1 Oct 2026.
+// 20109309/20109353/20109511 are the A/B test variants, live from 29 Sep, so d30 = d7 for them.
 // send/deliv/bounce count messages; u* count distinct users.
 const M = {
-  19381134:{d30:{send:793,deliv:790,bounce:3,uSend:248,uDeliv:247,uOpen:143,uOpenF:140,uClick:81,uUnsub:4},
-            d7 :{send:236,deliv:233,bounce:3,uSend:76, uDeliv:75, uOpen:49, uOpenF:47, uClick:24,uUnsub:1}},
-  19381812:{d30:{send:2435,deliv:2417,bounce:18,uSend:622,uDeliv:611,uOpen:379,uOpenF:373,uClick:214,uUnsub:21},
-            d7 :{send:574, deliv:571, bounce:3, uSend:175,uDeliv:172,uOpen:108,uOpenF:102,uClick:51, uUnsub:6}},
-  19381863:{d30:{send:74,deliv:74,bounce:0,uSend:30,uDeliv:30,uOpen:16,uOpenF:16,uClick:7,uUnsub:4},
-            d7 :{send:14,deliv:14,bounce:0,uSend:11,uDeliv:11,uOpen:6, uOpenF:6, uClick:2,uUnsub:1}},
-  13384256:{d30:{send:1455,deliv:1453,uSend:362,uDeliv:360,uOpen:130,uninst:3},
-            d7 :{send:315, deliv:313, uSend:112,uDeliv:110,uOpen:26, uninst:2}},
+  19381134:{d30:{send:893,deliv:890,bounce:3,uSend:262,uDeliv:261,uOpen:150,uOpenF:147,uClick:89,uUnsub:4},
+            d7 :{send:185,deliv:185,bounce:0,uSend:62, uDeliv:62, uOpen:49, uOpenF:47, uClick:26,uUnsub:0}},
+  19381812:{d30:{send:2505,deliv:2487,bounce:18,uSend:634,uDeliv:623,uOpen:382,uOpenF:377,uClick:222,uUnsub:21},
+            d7 :{send:394, deliv:392, bounce:2, uSend:150,uDeliv:148,uOpen:90, uOpenF:87, uClick:49, uUnsub:4}},
+  20109309:{d30:{send:36,deliv:36,bounce:0,uSend:22,uDeliv:22,uOpen:11,uOpenF:11,uClick:3,uUnsub:0},
+            d7 :{send:36,deliv:36,bounce:0,uSend:22,uDeliv:22,uOpen:11,uOpenF:11,uClick:3,uUnsub:0}},
+  20109353:{d30:{send:97,deliv:97,bounce:0,uSend:59,uDeliv:59,uOpen:27,uOpenF:27,uClick:14,uUnsub:1},
+            d7 :{send:97,deliv:97,bounce:0,uSend:59,uDeliv:59,uOpen:27,uOpenF:27,uClick:14,uUnsub:1}},
+  19381863:{d30:{send:78,deliv:78,bounce:0,uSend:36,uDeliv:36,uOpen:16,uOpenF:16,uClick:7,uUnsub:4},
+            d7 :{send:10,deliv:10,bounce:0,uSend:8, uDeliv:8, uOpen:2, uOpenF:2, uClick:1,uUnsub:0}},
+  20109511:{d30:{send:4,deliv:4,bounce:0,uSend:3,uDeliv:3,uOpen:0,uOpenF:0,uClick:0,uUnsub:0},
+            d7 :{send:4,deliv:4,bounce:0,uSend:3,uDeliv:3,uOpen:0,uOpenF:0,uClick:0,uUnsub:0}},
+  13384256:{d30:{send:1517,deliv:1515,uSend:378,uDeliv:376,uOpen:130,uninst:3},
+            d7 :{send:314, deliv:314, uSend:98, uDeliv:98, uOpen:25, uninst:0}},
   17690487:{d30:{send:4,deliv:4,uSend:4,uDeliv:4,uOpen:0,uninst:0},
             d7 :{send:0,deliv:0,uSend:0,uDeliv:0,uOpen:0,uninst:0}},
-  16373389:{d30:{send:19,deliv:19,uSend:7,uDeliv:7,uOpen:1,uninst:0},
-            d7 :{send:1, deliv:1, uSend:1,uDeliv:1,uOpen:1,uninst:0}},
-  16985565:{d30:{send:394,deliv:390,bounce:4,uSend:295,uDeliv:291,uClick:248,uClickF:231},
-            d7 :{send:37, deliv:36, bounce:1,uSend:35, uDeliv:34, uClick:34, uClickF:34}},
-  19984008:{d30:{send:86,deliv:85,bounce:1,uSend:68,uDeliv:67,uClick:65,uClickF:65},
-            d7 :{send:86,deliv:85,bounce:1,uSend:68,uDeliv:67,uClick:65,uClickF:65}},
-  16988774:{d30:{send:23,deliv:23,bounce:0,uSend:16,uDeliv:16,uClick:15,uClickF:13},
-            d7 :{send:6, deliv:6, bounce:0,uSend:6, uDeliv:6, uClick:5, uClickF:5}}
+  16373389:{d30:{send:19,deliv:19,uSend:8,uDeliv:8,uOpen:1,uninst:0},
+            d7 :{send:2, deliv:2, uSend:1,uDeliv:1,uOpen:0,uninst:0}},
+  16985565:{d30:{send:334,deliv:330,bounce:4,uSend:251,uDeliv:247,uClick:224,uClickF:215},
+            d7 :{send:0,  deliv:0,  bounce:0,uSend:0,  uDeliv:0,  uClick:0,  uClickF:0}},
+  19984008:{d30:{send:165,deliv:164,bounce:1,uSend:123,uDeliv:122,uClick:118,uClickF:118},
+            d7 :{send:121,deliv:120,bounce:1,uSend:98, uDeliv:97, uClick:94, uClickF:94}},
+  20110136:{d30:{send:27,deliv:27,bounce:0,uSend:26,uDeliv:26,uClick:24,uClickF:24},
+            d7 :{send:27,deliv:27,bounce:0,uSend:26,uDeliv:26,uClick:24,uClickF:24}},
+  16988774:{d30:{send:26,deliv:26,bounce:0,uSend:21,uDeliv:21,uClick:20,uClickF:19},
+            d7 :{send:7, deliv:7, bounce:0,uSend:7, uDeliv:7, uClick:7, uClickF:7}}
 };
 
-// Warehouse (insight_roots.*_log_iterable), filtered on workflowId 643021, 29 Aug - 27 Sep.
-// Includes every campaign in the workflow, labelled or not, so it exceeds the live-campaign totals above.
-const WAREHOUSE = {email:{msgs:3567,buyers:885}, push:{msgs:1482,buyers:365}, sms:{msgs:502,buyers:356}};
+// Warehouse (insight_roots.*_log_iterable), filtered on campaign_group = buyer_chat_notification, 2 Sep - 1 Oct.
+// That covers both workflow 643021 and the new SMS workflow 1068778, and nothing outside them.
+const WAREHOUSE = {email:{msgs:3662,buyers:902}, push:{msgs:1538,buyers:380}, sms:{msgs:552,buyers:381}};
 // 30-day channel overlap, distinct buyers (warehouse send logs, non-skipped, buyer_user_id not null)
 const OVERLAP = {
-  d30:{total:898, emailPush:287, emailSms:270, emailOnly:253, all:75, pushSms:1, smsOnly:10, pushOnly:2},
-  d7 :{total:251, emailPush:93,  emailSms:78,  emailOnly:57,  all:18, pushSms:1, smsOnly:3,  pushOnly:1}
+  d30:{total:912, emailPush:290, emailSms:288, emailOnly:238, all:86, pushSms:1, smsOnly:6, pushOnly:3},
+  d7 :{total:242, emailPush:77,  emailSms:91,  emailOnly:47,  all:20, pushSms:0, smsOnly:5, pushOnly:2}
 };
 // Deduplicated distinct buyers reached, warehouse send logs
 const REACH = {
-  d30:{total:898, email:885, push:365, sms:356, neither:253},
-  d7 :{total:251, email:246, push:113, sms:100, neither:57}
+  d30:{total:912, email:902, push:380, sms:381, neither:238},
+  d7 :{total:242, email:235, push:99,  sms:116, neither:47}
 };
 // Iterable segments: triggered the chat message event, SMS opted in, phone number on file
-const SMS_POOL = {d30:556, d7:175};
+const SMS_POOL = {d30:569, d7:171};
 // insight_reporting.crm_sms_push_whatsapp, attribution_mode = any_7d_post_send
 const AFTER = {
-  d30:{label:"29 Aug - 27 Sep",
-       push:{send:1482, eligible:697, session:146, message:139},
-       sms :{send:502,  eligible:495, session:103, message:63}},
-  d7 :{label:"21 - 27 Sep",
-       push:{send:315, eligible:152, session:43, message:35},
-       sms :{send:129, eligible:128, session:30, message:21}}
+  d30:{label:"2 Sep - 1 Oct",
+       push:{send:1538, eligible:727, session:145, message:138},
+       sms :{send:552,  eligible:540, session:113, message:70}},
+  d7 :{label:"25 Sep - 1 Oct",
+       push:{send:318, eligible:155, session:45, message:39},
+       sms :{send:153, eligible:148, session:38, message:23}}
 };
 
 // Tableau, published datasource "Enquiry" (Polaris enquiries, marketplace-wide - not filtered to this journey)
 const ENQ = {
-  d30:{label:"29 Aug - 27 Sep", enq:3024, enqResp:1856, onPlat:1541, msgReply:1529, consResp:382, consChat:358, buyers:978, buyersResp:832, sessions:1007, medianReply:98.5},
-  d7 :{label:"21 - 27 Sep",     enq:645,  enqResp:372,  onPlat:319,  msgReply:314,  consResp:69,  consChat:65,  buyers:207, buyersResp:175, sessions:216,  medianReply:70.5}
+  d30:{label:"2 Sep - 1 Oct", enq:3144, enqResp:1936, onPlat:1606, msgReply:1594, consResp:413, consChat:392, buyers:976, buyersResp:835, sessions:1005, medianReply:92},
+  d7 :{label:"25 Sep - 1 Oct", enq:652,  enqResp:401,  onPlat:340,  msgReply:340,  consResp:92,  consChat:92,  buyers:209, buyersResp:180, sessions:217,  medianReply:84}
 };
 // Buyer response rate by week - used to show the maturity lag
-const ENQ_WEEKS = [["31 Aug-6 Sep",365,75],["7-13 Sep",588,131],["14-20 Sep",457,89],["21-27 Sep",372,69]];
+const ENQ_WEEKS = [["7-13 Sep",588,131],["14-20 Sep",460,89],["21-27 Sep",385,81],["28 Sep-1 Oct",304,72]];
 
 const NAMES = {
   19381134:["Email 1 &mdash; new design (marketing)","buyer_chat_message_260813_2"],
   19381812:["Email 1 &mdash; new design (transactional)","buyer_chat_message_transactional_260813_2"],
-  19381863:["Email 2 &mdash; reminder, new design","buyer_chat_message_transactional_reminder_250813_2"],
+  20109309:["Email 1 &mdash; test, no preview (marketing)","buyer_chat_message_260813_3"],
+  20109353:["Email 1 &mdash; test, no preview (transactional)","buyer_chat_message_transactional_260813_3"],
+  19381863:["Email 2 &mdash; reminder, control","buyer_chat_message_transactional_reminder_250813_2"],
+  20109511:["Email 2 &mdash; reminder, test","buyer_chat_message_transactional_reminder_250813_3"],
   13384256:["Push 1","buyer_chat_message_push_250424_0"],
   17690487:["Push 2 &mdash; messaged multiple pros","buyer_chat_message_push_reminder_multiple_260107_0"],
   16373389:["Push 2 &mdash; single pro","buyer_chat_message_push_reminder_260107_0"],
   16985565:["SMS 1 &mdash; original","buyer_chat_message_SMS_250220_0"],
   19984008:["SMS 1 &mdash; rebuilt 22 Sep","buyer_chat_message_SMS_250220_0"],
+  20110136:["SMS 1 &mdash; own workflow","buyer_chat_message_SMS_260929_0"],
   16988774:["SMS 2 &mdash; reminder","buyer_chat_message_SMS_250220_0"]
 };
 
 const ARCHIVE = [
  ["#1","Push 1","Push","13384256","buyer_chat_message_push_250424_0","All buyers with a message from a pro","30 Apr 2026","",""],
  ["#2","WhatsApp 1","WhatsApp","19329016","buyer_chat_message_whatsapp_260810_0","Push ineligible / didn't deliver","10 Aug 2026","21 Aug 2026",""],
- ["#3","SMS 1","SMS","16985565","buyer_chat_message_SMS_250220_0","WhatsApp ineligible / didn't deliver","20 Feb 2026","","Conditional logic changed 19 Aug on Iterable's advice"],
+ ["#3","SMS 1","SMS","16985565","buyer_chat_message_SMS_250220_0","WhatsApp ineligible / didn't deliver","20 Feb 2026","22 Sep 2026","Superseded by the rebuilt campaign 19984008. Last send 22 Sep"],
  ["#4","Email 1 &mdash; loser of previous test","Email","18339842","buyer_chat_message_260529_0","Marketing + transactional opt-in","29 May 2026","6 Aug 2026",""],
  ["#5","Email 1 &mdash; loser of previous test","Email","18339693","buyer_chat_message_transactional_260529_0","Transactional only","29 May 2026","6 Aug 2026",""],
  ["#6","Email 1 &mdash; winner of previous test","Email","18592058","buyer_chat_message_260529_1","Marketing + transactional opt-in","16 Jun 2026","2 Sep 2026","Back on 17 Aug as control vs 19381134"],
@@ -653,8 +693,11 @@ const ARCHIVE = [
  ["#14","Email 2 &mdash; new design","Email","19381863","buyer_chat_message_transactional_reminder_250813_2","Hasn't replied yet","13 Aug 2026","",""],
  ["#15","WhatsApp 2","WhatsApp","19329050","buyer_chat_message_whatsapp_reminder_260810_0","Push ineligible / didn't deliver","10 Aug 2026","21 Aug 2026",""],
  ["#16","SMS 2 &mdash; reminder","SMS","16988774","buyer_chat_message_SMS_250220_0","WhatsApp ineligible / didn't deliver","20 Feb 2026","",""],
- ["#17","SMS 1 &mdash; rebuilt","SMS","19984008","buyer_chat_message_SMS_250220_0","Same as SMS 1 &mdash; duplicate built from scratch","22 Sep 2026","","Carries the buyer_chat_notification label and appears in the warehouse and reporting tables. It has carried all SMS 1 volume since 23 Sep &mdash; 16985565 has sent nothing since"],
- ["#18","SMS 1 &mdash; standalone workflow","SMS","20110136","buyer_chat_message_SMS_260929_0","Same as SMS 1 &mdash; split out to isolate delivery","30 Sep 2026","","Runs from its own workflow 1068778, not 643021. Built so delivery rate and drop-out points can be read without the push-eligibility branch in the way"]
+ ["#17","SMS 1 &mdash; rebuilt","SMS","19984008","buyer_chat_message_SMS_250220_0","Same as SMS 1 &mdash; duplicate built from scratch","22 Sep 2026","30 Sep 2026","Carried all SMS 1 volume 23&ndash;30 Sep. Disconnected from the journey on 30 Sep when SMS moved to its own workflow"],
+ ["#18","SMS 1 &mdash; standalone workflow","SMS","20110136","buyer_chat_message_SMS_260929_0","Same as SMS 1 &mdash; split out to isolate delivery","30 Sep 2026","","Runs from its own workflow 1068778, not 643021. Built so delivery rate and drop-out points can be read without the push-eligibility branch in the way"],
+ ["#19","Email 1 &mdash; test, no preview","Email","20109309","buyer_chat_message_260813_3","Marketing + transactional opt-in","29 Sep 2026","","A/B test variant &mdash; message preview removed"],
+ ["#20","Email 1 &mdash; test, no preview","Email","20109353","buyer_chat_message_transactional_260813_3","Transactional only","29 Sep 2026","","A/B test variant &mdash; message preview removed"],
+ ["#21","Email 2 &mdash; reminder, test","Email","20109511","buyer_chat_message_transactional_reminder_250813_3","Hasn't replied yet","29 Sep 2026","","A/B test variant &mdash; message preview removed"]
 ];
 
 const TL_SMS = [
@@ -737,19 +780,19 @@ const TL_EMAIL = [
 
 // Tableau daily [date, sends, opens] for the two live comm-#1 emails
 const DAILY_EMAIL = [
-  ["08-29",19,10], ["08-30",31,19], ["08-31",65,35], ["09-01",67,19], ["09-02",59,28], ["09-03",117,51],
-  ["09-04",77,28], ["09-05",75,42], ["09-06",51,32], ["09-07",155,63], ["09-08",191,89], ["09-09",226,108],
-  ["09-10",152,78], ["09-11",23,12], ["09-12",71,35], ["09-13",154,74], ["09-14",201,81], ["09-15",192,86],
-  ["09-16",119,44], ["09-17",111,41], ["09-18",91,53], ["09-19",68,36], ["09-20",111,68], ["09-21",175,103],
-  ["09-22",124,67], ["09-23",129,76], ["09-24",154,99], ["09-25",81,47], ["09-26",60,19], ["09-27",86,37]
+  ["09-02",59,28], ["09-03",117,51], ["09-04",77,28], ["09-05",75,42], ["09-06",51,32], ["09-07",155,63],
+  ["09-08",191,89], ["09-09",226,108], ["09-10",152,78], ["09-11",23,12], ["09-12",71,35], ["09-13",154,74],
+  ["09-14",201,81], ["09-15",192,86], ["09-16",119,44], ["09-17",111,41], ["09-18",91,53], ["09-19",68,36],
+  ["09-20",111,68], ["09-21",175,106], ["09-22",124,67], ["09-23",129,76], ["09-24",154,99], ["09-25",81,48],
+  ["09-26",60,20], ["09-27",86,45], ["09-28",134,74], ["09-29",107,62], ["09-30",117,42], ["10-01",126,71]
 ];
 // Tableau daily [date, sends, clicks] for SMS 1
 const DAILY_SMS = [
-  ["08-29",10,6], ["08-30",11,6], ["08-31",22,11], ["09-01",14,6], ["09-02",16,8], ["09-03",10,4],
-  ["09-04",10,4], ["09-05",5,3], ["09-06",8,4], ["09-07",17,10], ["09-08",25,24], ["09-09",30,27],
-  ["09-10",21,19], ["09-11",6,5], ["09-12",11,11], ["09-13",21,21], ["09-14",22,22], ["09-15",18,17],
-  ["09-16",21,21], ["09-17",11,11], ["09-18",14,13], ["09-19",11,11], ["09-20",22,21], ["09-21",23,22],
-  ["09-22",16,16], ["09-23",21,21], ["09-24",20,19], ["09-25",23,22], ["09-26",8,7], ["09-27",12,12]
+  ["09-02",16,8], ["09-03",10,4], ["09-04",10,4], ["09-05",5,3], ["09-06",8,4], ["09-07",17,10],
+  ["09-08",25,24], ["09-09",30,27], ["09-10",21,19], ["09-11",6,5], ["09-12",11,11], ["09-13",21,21],
+  ["09-14",22,22], ["09-15",18,17], ["09-16",21,21], ["09-17",11,11], ["09-18",14,13], ["09-19",11,11],
+  ["09-20",22,21], ["09-21",23,22], ["09-22",16,16], ["09-23",21,21], ["09-24",20,19], ["09-25",23,22],
+  ["09-26",8,7], ["09-27",12,12], ["09-28",28,28], ["09-29",28,27], ["09-30",28,27], ["10-01",20,18]
 ];
 
 /* ---------------- helpers ---------------- */
@@ -765,7 +808,7 @@ function nameCell(id){
 }
 
 /* ---------------- render tables ---------------- */
-const EMAIL_IDS=[19381134,19381812,19381863], PUSH_IDS=[13384256,17690487,16373389], SMS_IDS=[16985565,19984008,16988774];
+const EMAIL_IDS=[19381134,20109309,19381812,20109353,19381863,20109511], PUSH_IDS=[13384256,17690487,16373389], SMS_IDS=[16985565,19984008,20110136,16988774];
 
 function sum(ids,win,keys){
   const o={}; keys.forEach(k=>o[k]=0);
@@ -778,7 +821,7 @@ function render(win){
   document.getElementById("winNote").innerHTML =
     `Showing <strong>${E.label} 2026</strong>. Every rate in your spec divides by messages sent &mdash; the <span class="mono">chatMessageCreated</span> trigger &mdash; which is not yet available, so shares below use buyers reached by email as the stand-in. See the note under the table.`;
 
-  const entries = M[19381134][win].uDeliv + M[19381812][win].uDeliv;
+  const entries = M[19381134][win].uDeliv + M[19381812][win].uDeliv + M[20109309][win].uDeliv + M[20109353][win].uDeliv;
 
   // --- channel roll-ups from the live campaigns ---
   const ch = {
@@ -796,7 +839,7 @@ function render(win){
     roll[k]=t;
   }
   const pushU = M[13384256][win].uDeliv;
-  const smsU  = M[16985565][win].uDeliv + M[19984008][win].uDeliv;
+  const smsU  = M[16985565][win].uDeliv + M[19984008][win].uDeliv + M[20110136][win].uDeliv;
   const neither = Math.max(entries - pushU - smsU, 0);
 
   const R = REACH[win];
@@ -885,10 +928,11 @@ function render(win){
 
   // --- sms table ---
   rows="";
+  const SMS1=[16985565,19984008,20110136];
   SMS_IDS.forEach(id=>{
     const d=M[id][win];
     rows += `<tr><td>${nameCell(id)}</td><td>${fnum(d.send)}</td><td>${fnum(d.deliv)}</td>
-      <td>${fpc(pc(d.deliv,d.send))}</td><td>${(id===16985565||id===19984008)?fpc(pc(d.uDeliv,entries)):'<span style="color:var(--ink-3)">n/a</span>'}</td>
+      <td>${fpc(pc(d.deliv,d.send))}</td><td>${SMS1.includes(id)?fpc(pc(d.uDeliv,entries)):'<span style="color:var(--ink-3)">n/a</span>'}</td>
       <td>${fpc(pc(d.uClick,d.uDeliv))}</td><td>${fpc(pc(d.uClickF,d.uDeliv))}</td></tr>`;
   });
   const st=sum(SMS_IDS,win,["send","deliv","uDeliv","uClick","uClickF"]);
@@ -896,10 +940,10 @@ function render(win){
     <td>${fpc(pc(st.deliv,st.send))}</td><td>&mdash;</td><td>${fpc(pc(st.uClick,st.uDeliv))}</td><td>${fpc(pc(st.uClickF,st.uDeliv))}</td></tr>`;
   document.getElementById("smsRows").innerHTML=rows;
 
-  const sc=w=>({uClick:M[16985565][w].uClick+M[19984008][w].uClick, uDeliv:M[16985565][w].uDeliv+M[19984008][w].uDeliv});
+  const sc=w=>({uClick:SMS1.reduce((a,i)=>a+M[i][w].uClick,0), uDeliv:SMS1.reduce((a,i)=>a+M[i][w].uDeliv,0)});
   const s30=sc("d30"), s7=sc("d7");
   document.getElementById("smsWarn").innerHTML =
-    `SMS 1 recorded <strong>${fnum(s7.uClick)} unique clickers against ${fnum(s7.uDeliv)} delivered buyers</strong> in the last 7 days &mdash; ${fpc(pc(s7.uClick,s7.uDeliv))}, which is not plausible human behaviour. Over 30 days it reads ${fpc(pc(s30.uClick,s30.uDeliv))}. Rebuilding the campaign from scratch on 22 Sep did not change it: the new campaign 19984008 is running at ${fpc(pc(M[19984008].d30.uClick,M[19984008].d30.uDeliv))}, so the fault is not campaign-level state.`;
+    `SMS 1 recorded <strong>${fnum(s7.uClick)} unique clickers against ${fnum(s7.uDeliv)} delivered buyers</strong> in the last 7 days &mdash; ${fpc(pc(s7.uClick,s7.uDeliv))}, which is not plausible human behaviour. Over 30 days it reads ${fpc(pc(s30.uClick,s30.uDeliv))}. Neither the 22 Sep rebuild nor the 30 Sep move to a separate workflow changed it: 19984008 runs at ${fpc(pc(M[19984008].d30.uClick,M[19984008].d30.uDeliv))} and the new 20110136 at ${fpc(pc(M[20110136].d30.uClick,M[20110136].d30.uDeliv))}. Confirmed 30 Sep as faulty bot detection &mdash; see below.`;
 
   // --- marketplace response ---
   document.getElementById("e-seller").innerHTML = fpc(pc(E.enqResp,E.enq));
@@ -1034,7 +1078,7 @@ buildArchive();
 buildTimeline("tlSms",TL_SMS);
 buildTimeline("tlEmail",TL_EMAIL);
 comboChart(document.getElementById("emailChart"),DAILY_EMAIL,cssv("--email"),"Email open rate",[]);
-comboChart(document.getElementById("smsChart"),DAILY_SMS,cssv("--sms"),"SMS click rate",[[10,"quiet hours off",false],[25,"phone casing fix",false]]);
+comboChart(document.getElementById("smsChart"),DAILY_SMS,cssv("--sms"),"SMS click rate",[[6,"quiet hours off",true],[28,"own workflow",false]]);
 </script>
 
 </body>
