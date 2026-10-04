@@ -191,6 +191,7 @@ figure.tl-fig figcaption{padding:9px 12px;font-size:12px;color:var(--ink-3);bord
     <button class="tab" role="tab" id="tab-perf" aria-controls="p-perf" aria-selected="true">Performance</button>
     <button class="tab" role="tab" id="tab-tests" aria-controls="p-tests" aria-selected="false">Tests</button>
     <button class="tab" role="tab" id="tab-arch" aria-controls="p-arch" aria-selected="false">Archive &amp; change log</button>
+    <button class="tab" role="tab" id="tab-seller" aria-controls="p-seller" aria-selected="false">Seller chat messages</button>
   </div>
 
   <!-- ============ PERFORMANCE ============ -->
@@ -590,6 +591,59 @@ figure.tl-fig figcaption{padding:9px 12px;font-size:12px;color:var(--ink-3);bord
       <h2>Change log &mdash; Email</h2>
       <div class="timeline" id="tlEmail"></div>
     </div>
+  </section>
+  <!-- ============ SELLER CHAT MESSAGES ============ -->
+  <section class="panel" id="p-seller" role="tabpanel" aria-labelledby="tab-seller" hidden>
+    <div>
+      <h2>Seller chat messages &mdash; snipped message preview</h2>
+      <p class="lede">Impact of the 4 Sep 2026 change that replaced the full buyer message / request details with a truncated (snipped) preview, to lift curiosity clicks. Pre/post across all 16 seller message-alert campaigns (Iterable journey <span class="mono">746944</span>). Pre: 5 Aug&ndash;3 Sep; post: 4 Sep&ndash;3 Oct 2026 &mdash; 30 days each. Observational pre/post, not an A/B test.</p>
+    </div>
+
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(185px,1fr));gap:12px">
+      <div class="tile"><span class="s">Click rate (clicks/sends)</span><span class="v">13.2% &rarr; 17.0%</span><span class="s"><strong>Increase +3.8pp &mdash; statistically significant</strong></span></div>
+      <div class="tile"><span class="s">Click-to-open (clicks/opens)</span><span class="v">26.1% &rarr; 37.2%</span><span class="s"><strong>Increase +11.1pp &mdash; statistically significant</strong></span></div>
+      <div class="tile"><span class="s">Bounce rate</span><span class="v">0.56% &rarr; 0.95%</span><span class="s"><strong>Increase +0.39pp &mdash; statistically significant</strong></span></div>
+      <div class="tile"><span class="s">Filtered open rate</span><span class="v">50.6% &rarr; 45.7%</span><span class="s"><strong>Decrease &minus;4.8pp &mdash; statistically significant</strong></span></div>
+    </div>
+
+    <div>
+      <h3>Did snipping the preview increase clicks?</h3>
+      <p class="lede" style="max-width:74ch">Yes. Click rate rose from 13.2% to 17.0% (<strong>Increase, statistically significant</strong>), and click-to-open &mdash; which isolates the curiosity effect among people who opened &mdash; rose from 26.1% to 37.2% (<strong>Increase, statistically significant</strong>). The aggregate gain is driven by the three highest-volume campaigns (paid_plan_quote, paid_plan_quote_reminder, sufficient), all of which rose.</p>
+    </div>
+
+    <div style="overflow-x:auto">
+      <h3>Pre vs post &mdash; all 16 campaigns combined</h3>
+      <table>
+        <thead><tr><th class="l">Metric</th><th>Pre (5 Aug&ndash;3 Sep)</th><th>Post (4 Sep&ndash;3 Oct)</th><th>Change</th></tr></thead>
+        <tbody>
+          <tr><td class="l">Sends</td><td>7,661</td><td>6,224</td><td>&mdash;</td></tr>
+          <tr><td class="l">Clicks</td><td>1,010</td><td>1,058</td><td>&mdash;</td></tr>
+          <tr><td class="l">Click rate</td><td>13.18%</td><td>17.00%</td><td><strong>Increase +3.82pp</strong></td></tr>
+          <tr><td class="l">Click-to-open rate</td><td>26.08%</td><td>37.17%</td><td><strong>Increase +11.10pp</strong></td></tr>
+          <tr><td class="l">Filtered open rate</td><td>50.55%</td><td>45.73%</td><td><strong>Decrease &minus;4.83pp</strong></td></tr>
+          <tr><td class="l">Bounce rate</td><td>0.56%</td><td>0.95%</td><td><strong>Increase +0.39pp</strong></td></tr>
+          <tr><td class="l">Unsub rate</td><td>0.05%</td><td>0.03%</td><td>Decrease &minus;0.02pp</td></tr>
+        </tbody>
+      </table>
+      <p class="footnote">Bold = statistically significant (two-proportion z-test, p&lt;0.05). Click rate z=6.28, p&lt;0.0001; click-to-open z=9.74, p&lt;0.0001; open rate z=&minus;5.66, p&lt;0.0001; bounce z=2.65, p=0.008. Unsub change is not significant.</p>
+    </div>
+
+    <div style="overflow-x:auto">
+      <h3>By campaign &mdash; click rate pre vs post</h3>
+      <table>
+        <thead><tr><th class="l">Campaign (seller_message_&hellip;)</th><th>Pre sends</th><th>Pre CTR</th><th>Post sends</th><th>Post CTR</th><th>&Delta;</th></tr></thead>
+        <tbody><tr><td class="l mono">paid_plan_quote</td><td>2,908</td><td>13.3%</td><td>2,424</td><td>19.9%</td><td>+6.6pp</td></tr><tr><td class="l mono">paid_plan_quote_reminder</td><td>1,752</td><td>10.3%</td><td>1,487</td><td>11.7%</td><td>+1.4pp</td></tr><tr><td class="l mono">sufficient</td><td>1,025</td><td>11.2%</td><td>974</td><td>17.5%</td><td>+6.2pp</td></tr><tr><td class="l mono">free_quote</td><td>494</td><td>19.4%</td><td>271</td><td>19.9%</td><td>+0.5pp</td></tr><tr><td class="l mono">free_trial_quote</td><td>288</td><td>24.0%</td><td>249</td><td>28.1%</td><td>+4.1pp</td></tr><tr><td class="l mono">free_quote_reminder</td><td>228</td><td>8.8%</td><td>147</td><td>14.3%</td><td>+5.5pp</td></tr><tr><td class="l mono">free_trial_quote_reminder</td><td>199</td><td>17.6%</td><td>177</td><td>13.6%</td><td>&minus;4.0pp</td></tr><tr><td class="l mono">approaching_reminder</td><td>170</td><td>9.4%</td><td>175</td><td>12.0%</td><td>+2.6pp</td></tr><tr><td class="l mono">free_trial_ne_message</td><td>119</td><td>16.0%</td><td>56</td><td>25.0%</td><td>+9.0pp</td></tr><tr><td class="l mono">free_trial_eligible_quote</td><td>117</td><td>12.0%</td><td>70</td><td>12.9%</td><td>+0.9pp</td></tr><tr><td class="l mono">free_trial_message_mktg</td><td>102</td><td>28.4%</td><td>31</td><td>22.6%</td><td>&minus;5.8pp</td></tr><tr><td class="l mono">free_trial_eligible_quote_reminder</td><td>83</td><td>10.8%</td><td>47</td><td>2.1%</td><td>&minus;8.7pp</td></tr><tr><td class="l mono">free_trial_ne_message_reminder</td><td>51</td><td>5.9%</td><td>38</td><td>7.9%</td><td>+2.0pp</td></tr><tr><td class="l mono">free_message</td><td>50</td><td>16.0%</td><td>36</td><td>16.7%</td><td>+0.7pp</td></tr><tr><td class="l mono">free_message_reminder</td><td>47</td><td>6.4%</td><td>34</td><td>2.9%</td><td>&minus;3.5pp</td></tr><tr><td class="l mono">free_trial_message_reminder</td><td>28</td><td>17.9%</td><td>8</td><td>12.5%</td><td>&minus;5.4pp</td></tr></tbody>
+        <tfoot><tr><td class="l"><strong>All campaigns</strong></td><td><strong>7,661</strong></td><td><strong>13.2%</strong></td><td><strong>6,224</strong></td><td><strong>17.0%</strong></td><td><strong>+3.8pp</strong></td></tr></tfoot>
+      </table>
+      <p class="footnote">The aggregate gain is carried by the three highest-volume campaigns. Small-volume campaigns that fell (e.g. eligible_quote_reminder at 47 sends) are too low to read individually.</p>
+    </div>
+
+    <div class="callout" style="background:var(--warn-bg);border-color:color-mix(in srgb,var(--warn) 30%,transparent);color:var(--ink)">
+      <strong>Read with care</strong>
+      <span>This is an observational pre/post comparison, not an A/B test, so audience mix, seasonality and the lower post-period send volume can't be fully ruled out &mdash; but the click-rate and click-to-open gains are large and highly significant, and the click-to-open jump is the signature you'd expect if snipping drives curiosity among openers. Two secondary moves to monitor: filtered opens fell ~5pp (likely audience/deliverability drift, not the in-body snip), and bounce rose a small but significant 0.39pp (a message snip should not affect deliverability).</span>
+    </div>
+
+    <p class="footnote">Sources: Tableau &#128193; Email - Country-Date-Domain-Campaign (16 seller_message campaign IDs; sends, clicks, filtered opens, bounces, unsubs; windows 5 Aug&ndash;3 Sep and 4 Sep&ndash;3 Oct 2026); Iterable journey 746944; two-proportion z-tests in Python.</p>
   </section>
 </div>
 
@@ -1050,7 +1104,7 @@ function buildTimeline(el,items){
 }
 
 /* ---------------- tabs ---------------- */
-const tabs=[["tab-perf","p-perf"],["tab-tests","p-tests"],["tab-arch","p-arch"]];
+const tabs=[["tab-perf","p-perf"],["tab-tests","p-tests"],["tab-arch","p-arch"],["tab-seller","p-seller"]];
 tabs.forEach(([t,p])=>{
   document.getElementById(t).addEventListener("click",()=>{
     tabs.forEach(([t2,p2])=>{
