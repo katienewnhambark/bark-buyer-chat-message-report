@@ -178,7 +178,7 @@ figure.tl-fig figcaption{padding:9px 12px;font-size:12px;color:var(--ink-3);bord
     <div>
       <div class="eyebrow">Iterable workflow 643021 &middot; project 8947</div>
       <h1>Buyer &mdash; Seller Sent Message</h1>
-      <p class="lede">Send monitoring for the buyer chat-notification journey: what reaches buyers on each channel, what we're testing, and what changed. Figures pulled live from Iterable, the warehouse and Tableau on <span class="mono">2 Oct 2026</span>.</p>
+      <p class="lede">Send monitoring for the buyer chat-notification journey: what reaches buyers on each channel, what we're testing, and what changed. Figures pulled live from Iterable, the warehouse and Tableau on <span class="mono">9 Oct 2026</span>.</p>
     </div>
     <div class="meta-links">
       <a href="https://app.iterable.com/workflows/643021/edit?mode=beta&amp;workflowType=Published&amp;projectId=8947" target="_blank" rel="noopener">Published journey in Iterable &rarr;</a>
@@ -191,7 +191,6 @@ figure.tl-fig figcaption{padding:9px 12px;font-size:12px;color:var(--ink-3);bord
     <button class="tab" role="tab" id="tab-perf" aria-controls="p-perf" aria-selected="true">Performance</button>
     <button class="tab" role="tab" id="tab-tests" aria-controls="p-tests" aria-selected="false">Tests</button>
     <button class="tab" role="tab" id="tab-arch" aria-controls="p-arch" aria-selected="false">Archive &amp; change log</button>
-    <button class="tab" role="tab" id="tab-seller" aria-controls="p-seller" aria-selected="false">Seller chat messages</button>
   </div>
 
   <!-- ============ PERFORMANCE ============ -->
@@ -226,16 +225,16 @@ figure.tl-fig figcaption{padding:9px 12px;font-size:12px;color:var(--ink-3);bord
 
       <div class="callout warn">
         <h4>The denominator you want is still the one thing missing</h4>
-        <p>Every rate in your spec divides by <strong>messages sent</strong> &mdash; <span class="mono">chatMessageCreated</span> where <span class="mono">receiver != 'professional'</span>. That event stream is still not exposed in the warehouse: Hex re-checked on 28 Sep and again found no accessible table carrying the event timestamp, buyer identity, <span class="mono">receiver</span> and message direction together. This is the third run in a row it has come back blocked. Until it is, "expected" cannot be measured and the percentages above use buyers reached by email as the stand-in.</p>
+        <p>Every rate in your spec divides by <strong>messages sent</strong> &mdash; <span class="mono">chatMessageCreated</span> where <span class="mono">receiver != 'professional'</span>. That event stream is still not exposed in the warehouse: Hex re-checked on 9 Oct and again found no accessible table carrying the event timestamp, buyer identity, <span class="mono">receiver</span> and message direction together. This is the fifth run in a row it has come back blocked, and it is now also what prevents us explaining the 6 Oct volume step. Until it is, "expected" cannot be measured and the percentages above use buyers reached by email as the stand-in.</p>
         <p><strong>Everything else is unblocked.</strong> The three curated send logs are queryable, the SMS opt-in pool comes from Iterable segments, and phone-number state is readable. Only the trigger count is missing, and it has been the sole outstanding ask since 18 Sep.</p>
         <div class="tw" style="box-shadow:none">
           <table>
             <thead><tr><th>Candidate denominator</th><th>30-day value</th><th>Why it is or isn't usable</th></tr></thead>
             <tbody>
               <tr><td><span class="mono">chatMessageCreated</span> events, receiver &ne; professional</td><td class="blocked">not available</td><td class="l">The real thing. Needs the Iterable custom-event stream exposed.</td></tr>
-              <tr><td>Distinct buyers sent a journey email</td><td>885</td><td class="l">Used above. Rests on the 26 Aug finding that every triggering buyer gets an email.</td></tr>
-              <tr><td>Polaris enquiries with a seller message (Tableau)</td><td>1,529</td><td class="l">Enquiry-level and first message only, so it undercounts repeat messages.</td></tr>
-              <tr><td>Polaris buyers with a seller response (Tableau)</td><td>832</td><td class="l"><strong>Do not use.</strong> Fewer than the 885 buyers who received an email, so the journey clearly reaches buyers outside Polaris enquiries.</td></tr>
+              <tr><td>Distinct buyers sent a journey email</td><td>1,178</td><td class="l">Used above. Rests on the 26 Aug finding that every triggering buyer gets an email.</td></tr>
+              <tr><td>Polaris enquiries with a seller message (Tableau)</td><td>2,286</td><td class="l">Enquiry-level and first message only, so it undercounts repeat messages.</td></tr>
+              <tr><td>Polaris buyers with a seller response (Tableau)</td><td>1,148</td><td class="l"><strong>Do not use.</strong> Fewer than the 1,178 buyers who received an email, so the journey clearly reaches buyers outside Polaris enquiries.</td></tr>
             </tbody>
           </table>
         </div>
@@ -253,8 +252,8 @@ figure.tl-fig figcaption{padding:9px 12px;font-size:12px;color:var(--ink-3);bord
       </div>
       <div class="callout crit">
         <h4>The push-and-SMS overlap is far bigger than the spot check suggested</h4>
-        <p><strong>76 buyers received both push and SMS</strong> in the 30-day window, not the 3 found in the 26 Aug spot check. That is 8.4% of everyone the journey reached, and more than one in five of everyone who got an SMS. All but one of them also received an email, so a meaningful slice of buyers is getting three notifications for the same seller message.</p>
-        <p>This is period-level overlap rather than proof of the race condition on its own &mdash; confirming that needs each buyer's push and SMS timestamps checked against the same trigger. But it keeps the 10-minute push-check delay as the highest-value unshipped fix on this journey, and it is worth costing: 76 buyers over 30 days is 76 avoidable SMS. The figure has not moved since 18 Sep, so the delay has not shipped.</p>
+        <p><strong>172 buyers received both push and SMS</strong> in the 30-day window, against 76 a week ago and the 3 found in the 26 Aug spot check. That is 14.5% of everyone the journey reached, up from 8.4%. All but four of them also received an email, so a growing slice of buyers is getting three notifications for the same seller message.</p>
+        <p>The rise tracks the 6 Oct volume step rather than any change to the journey logic, which is the point: <strong>the race condition scales with volume.</strong> At the old run rate it cost about 76 avoidable SMS a month; at the new one it is on course for several times that. The 10-minute push-check delay was already the highest-value unshipped fix here and the 6 Oct step makes it materially more expensive to keep postponing.</p>
       </div>
       <p class="footnote" id="overlapFoot"></p>
     </div>
@@ -298,7 +297,7 @@ figure.tl-fig figcaption{padding:9px 12px;font-size:12px;color:var(--ink-3);bord
         <h4>SMS click rate is still not measuring humans</h4>
         <p id="smsWarn"></p>
         <p><strong>Confirmed 30 Sep:</strong> the fault is bot <em>detection</em>, not a filter that stopped running. Spot checks found click events recorded as <span class="mono">isBot = false</span> that are actually bots. Because the filtered metric works by excluding events flagged <span class="mono">isBot = true</span>, anything mislabelled false passes straight through it &mdash; so the filtered figure is not a safe fallback either. Do not report SMS click rate in any weekly summary, in either form, until Iterable rectify the detection.</p>
-        <p><strong>The rebuild answered one question.</strong> The from-scratch duplicate (<a href="https://app.iterable.com/campaigns/19984008" target="_blank" rel="noopener">19984008</a>) has run six days at <strong>97.0%</strong> &mdash; 65 clickers from 67 delivered. Whatever is inflating clicks is not campaign-specific state, so rebuilding campaigns will not fix it. That narrows it to click tracking or link handling, which is where Iterable should be pointed.</p>
+        <p><strong>Something changed on 6 Oct.</strong> The rate had survived a from-scratch rebuild (19984008, 97.0%) and the move to a separate workflow, which ruled out campaign and workflow state. It then fell by roughly a third on the same day journey volume stepped up fourfold, and the filtered and unfiltered figures separated again. Two readings fit: the inflation was partly a fixed amount of bot traffic that is now diluted by real sends, or Iterable have changed something on their side. <strong>Worth asking Iterable directly whether they deployed a detection change around 6 Oct</strong> &mdash; if they did, the September figures may be re-scorable after all.</p>
       </div>
     </div>
 
@@ -323,7 +322,7 @@ figure.tl-fig figcaption{padding:9px 12px;font-size:12px;color:var(--ink-3);bord
         <h4>About a third of the contactable pool isn't getting an SMS</h4>
         <p id="smsGap"></p>
         <p>That query is the single most useful next number on this journey &mdash; it turns "SMS sends look low" into either "working as designed" or a specific count of buyers who fell through. It is now computable from <span class="mono">push_log_iterable</span>.</p>
-        <p><strong>Update, 28 Sep &mdash; the casing fix did not close the gap.</strong> The 23 Sep change widened the SMS check from <span class="mono">PhoneNumber</span> to accept <span class="mono">phoneNumber</span> as well, on the theory that buyers with only the lower-case property were failing it. Five days on, volume is flat: 85 messages in the five days before against 83 in the five days after. If the casing were the main blocker, sends should have risen. Either the fix is not reaching the buyers it was meant to, or something earlier in the journey filters them out first &mdash; the push-not-sent condition is the obvious place to look next.</p>
+        <p><strong>Update, 9 Oct &mdash; reach against the pool has improved, but not because anything was fixed.</strong> SMS now reaches <strong>600 of 738</strong> buyers in the pool over 30 days, against 381 of 569 a week ago. Both numbers grew: the pool is up about 30% and sends up about 57%, so the ratio genuinely moved. But the driver is the 6 Oct volume step, not the casing fix or the workflow move &mdash; SMS as a share of comm #1 email volume is unchanged at about 19%. The eligibility logic is doing what it always did, on a bigger input.</p>
       </div>
 
       <div class="callout info">
@@ -383,13 +382,13 @@ figure.tl-fig figcaption{padding:9px 12px;font-size:12px;color:var(--ink-3);bord
       <div class="chart-grid">
         <div class="chart">
           <h3>Email: sends and open rate</h3>
-          <p class="sub">Comm #1, all four campaigns combined (19381134 + 19381812 + the two test variants). 2 Sep &ndash; 1 Oct. The 17 Aug machine-opens break now sits before this window, so everything here is on the same footing.</p>
+          <p class="sub">Comm #1, all four campaigns combined (19381134 + 19381812 + the two test variants). 9 Sep &ndash; 8 Oct. The marker is 6 Oct, when marketplace enquiry volume stepped up roughly fourfold and took the whole journey with it.</p>
           <div class="legend"><span><i style="background:var(--email)"></i>Open rate</span><span><i style="background:var(--line);border:1px solid var(--ink-3)"></i>Sends</span></div>
           <div id="emailChart"></div>
         </div>
         <div class="chart">
           <h3>SMS: click rate</h3>
-          <p class="sub">SMS 1, all three campaigns combined (16985565 + 19984008 + 20110136). 2 Sep &ndash; 1 Oct. Markers: quiet hours removed 8 Sep, SMS moved to its own workflow 30 Sep.</p>
+          <p class="sub">SMS 1, all three campaigns combined (16985565 + 19984008 + 20110136). 9 Sep &ndash; 8 Oct. Markers: SMS moved to its own workflow 30 Sep, and the 6 Oct journey-wide volume step.</p>
           <div class="legend"><span><i style="background:var(--sms)"></i>Click rate</span><span><i style="background:var(--line);border:1px solid var(--ink-3)"></i>Sends</span></div>
           <div id="smsChart"></div>
         </div>
@@ -494,7 +493,7 @@ figure.tl-fig figcaption{padding:9px 12px;font-size:12px;color:var(--ink-3);bord
 
       <details class="fold" id="previewTest" open>
         <summary>
-          <span class="fold-title"><span class="t">Message preview A/B test</span><span class="s">Email 1 and Email 2 reminder &middot; preview vs no preview &middot; all three cells live from 29 Sep 2026</span></span>
+          <span class="fold-title"><span class="t">Message preview A/B test</span><span class="s">Email 1 and Email 2 reminder &middot; preview vs no preview &middot; live from 29 Sep 2026 &middot; 10 days in</span></span>
           <span class="chev" aria-hidden="true"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9.5 12 15.5 18 9.5"/></svg></span>
         </summary>
         <div class="fold-body">
@@ -529,36 +528,32 @@ figure.tl-fig figcaption{padding:9px 12px;font-size:12px;color:var(--ink-3);bord
           </div>
           <p class="footnote">Control is the live creative rendered from Iterable template <span class="mono">25339375</span>. Test is rendered live from Iterable template <span class="mono">26524362</span>. The Email 2 reminder test (<span class="mono">26524669</span>) applies the same change and is not shown separately. Brand imagery hosted on Iterable&rsquo;s asset library could not be fetched into this environment, so logo, icons, QR and store badges appear as placeholders &mdash; layout, copy and CTAs are the real thing.</p>
 
-          <h3 class="fold-h">First read &mdash; 29 Sep to 1 Oct</h3>
-          <p class="note">Three days. Rates are per unique recipient. Differences checked with two-proportion z-tests; significance noted only where a difference reached it.</p>
+          <h3 class="fold-h">Second read &mdash; 2 to 8 Oct</h3>
+          <p class="note">Rates are per unique recipient. Differences checked with two-proportion z-tests; significance noted only where a difference reached it.</p>
           <div class="tw">
             <table>
               <thead><tr><th>Cell</th><th>Recipients</th><th>Open rate</th><th>Click rate</th><th>Open change</th><th>Click change</th><th class="l">Result</th></tr></thead>
               <tbody>
-                <tr><td><strong>Marketing opt-in</strong><br><span class="mono" style="font-size:11.5px;color:var(--ink-3)">19381134 vs 20109309</span></td><td>32 / 22</td><td>81.2% &rarr; 50.0%</td><td>43.8% &rarr; 13.6%</td><td><strong>&minus;31.2pp</strong></td><td><strong>&minus;30.1pp</strong></td><td style="text-align:left"><strong>Decrease on both &mdash; statistically significant</strong></td></tr>
-                <tr><td><strong>Transactional only</strong><br><span class="mono" style="font-size:11.5px;color:var(--ink-3)">19381812 vs 20109353</span></td><td>77 / 59</td><td>53.2% &rarr; 45.8%</td><td>27.3% &rarr; 23.7%</td><td>&minus;7.5pp</td><td>&minus;3.5pp</td><td style="text-align:left">Decrease on both</td></tr>
-                <tr><td><strong>Email 2 reminder</strong><br><span class="mono" style="font-size:11.5px;color:var(--ink-3)">19381863 vs 20109511</span></td><td>6 / 3</td><td colspan="4" class="l blocked">too few recipients to read</td><td style="text-align:left" class="blocked">&mdash;</td></tr>
-                <tr class="total"><td>Pooled</td><td>109 / 81</td><td>61.5% &rarr; 46.9%</td><td>32.1% &rarr; 21.0%</td><td><strong>&minus;14.6pp</strong></td><td>&minus;11.1pp</td><td style="text-align:left"><strong>Open rate decrease &mdash; statistically significant</strong></td></tr>
+                <tr><td><strong>Marketing opt-in</strong><br><span class="mono" style="font-size:11.5px;color:var(--ink-3)">19381134 vs 20109309</span></td><td>169 / 172</td><td>75.7% &rarr; 72.7%</td><td>32.0% &rarr; 32.0%</td><td>&minus;3.1pp</td><td>+0.0pp</td><td style="text-align:left">Open decrease, click flat</td></tr>
+                <tr><td><strong>Transactional only</strong><br><span class="mono" style="font-size:11.5px;color:var(--ink-3)">19381812 vs 20109353</span></td><td>255 / 238</td><td>62.4% &rarr; 59.7%</td><td>26.3% &rarr; 26.9%</td><td>&minus;2.7pp</td><td>+0.6pp</td><td style="text-align:left">Open decrease, click increase</td></tr>
+                <tr><td><strong>Email 2 reminder</strong><br><span class="mono" style="font-size:11.5px;color:var(--ink-3)">19381863 vs 20109511</span></td><td>9 / 11</td><td colspan="4" class="l blocked">too few recipients to read</td><td style="text-align:left" class="blocked">&mdash;</td></tr>
+                <tr class="total"><td>Pooled</td><td>424 / 410</td><td>67.7% &rarr; 65.1%</td><td>28.5% &rarr; 29.0%</td><td>&minus;2.6pp</td><td>+0.5pp</td><td style="text-align:left">No difference reached significance</td></tr>
               </tbody>
             </table>
           </div>
 
-          <div class="callout crit">
-            <h4>Open rate should not be moving, and that is the finding</h4>
-            <p>The message preview sits in the email body. A buyer has to open the email before they can see whether it is there, so removing it <strong>cannot</strong> change open rate. Yet open rate is down 31.2pp in the marketing cell and 14.6pp pooled, both statistically significant. A creative change that is invisible at the moment of opening cannot produce that, so something other than the creative is driving it.</p>
-            <p>Two candidates worth checking before any click-rate reading is trusted. <strong>Assignment:</strong> the split is running 59% / 41% to control in the marketing cell and 57% / 43% in transactional, not 50/50, which suggests buyers are not being allocated evenly and may not be comparable. <strong>Tracking:</strong> the test templates were pasted in fresh, so it is worth confirming the open pixel survived the edit &mdash; a missing or altered pixel would depress opens on the test arm regardless of buyer behaviour.</p>
-            <p>Until one of those is ruled out, treat the click-rate numbers as unreadable too: they share the same denominator and the same assignment.</p>
-          </div>
-
           <div class="callout info">
-            <h4>Where this leaves the test</h4>
-            <p>Three days and 190 recipients is far too early for a verdict on the hypothesis either way, so nothing here should be read as the preview winning or losing. The useful output of this first read is the open-rate anomaly, which is a setup problem to fix rather than a result to interpret.</p>
-            <p>Once the split and the pixel are confirmed, restart the clock from that date rather than from 29 Sep &mdash; data collected under an uneven or mistracked split should not be pooled with what comes after.</p>
+            <h4>Last week&rsquo;s open-rate alarm was a false one</h4>
+            <p>The 29 Sep &ndash; 1 Oct read showed open rate down 31.2pp in the marketing cell and 14.6pp pooled, both statistically significant, on a split running 59/41 to control. On a full week at roughly even allocation &mdash; 169 against 172, and 255 against 238 &mdash; <strong>that gap has gone</strong>. Open rate is within 3pp on both cells and nothing reaches significance.</p>
+            <p>So the first read was small samples plus uneven early assignment, not a tracking fault. Recorded here because the conclusion was wrong and the correction matters more than the original flag.</p>
+            <p>Hex checked the tracking directly and found machine and proxy opens present on both arms at similar proportions (Apple, Gmail and Yahoo on each), and one template per campaign. <strong>One loose end:</strong> on the test transactional campaign 20109353, 34 of 673 messages (5.1%) were clicked with no open recorded, against 16 of 710 (2.3%) on its control. A click with no open usually means the pixel did not load. It is a small effect and does not change the read above, but the open pixel on template <span class="mono">26524413</span> is worth a look.</p>
           </div>
 
-
-
-
+          <div class="callout warn">
+            <h4>Click rate is flat, which is the real result so far</h4>
+            <p>The hypothesis was that removing the preview would cost clicks but drive more buyers into the app or web. Click rate has not moved &mdash; 32.0% against 32.0% in marketing, and 26.9% against 26.3% in transactional. So the expected cost has not materialised either.</p>
+            <p>That makes the downstream measure the whole decision, and it is still unreadable: <span class="mono">polaris_email_stats</span> has produced no buyer-session or buyer-message values since 27 Aug. Until that feed is fixed this test cannot be concluded in either direction, however long it runs. It is now the binding constraint on the test, not sample size.</p>
+          </div>
         </div>
       </details>
 
@@ -592,127 +587,74 @@ figure.tl-fig figcaption{padding:9px 12px;font-size:12px;color:var(--ink-3);bord
       <div class="timeline" id="tlEmail"></div>
     </div>
   </section>
-  <!-- ============ SELLER CHAT MESSAGES ============ -->
-  <section class="panel" id="p-seller" role="tabpanel" aria-labelledby="tab-seller" hidden>
-    <div>
-      <h2>Seller chat messages &mdash; snipped message preview</h2>
-      <p class="lede">Impact of the 4 Sep 2026 change that replaced the full buyer message / request details with a truncated (snipped) preview, to lift curiosity clicks. Pre/post across all 16 seller message-alert campaigns (Iterable journey <span class="mono">746944</span>). Pre: 5 Aug&ndash;3 Sep; post: 4 Sep&ndash;3 Oct 2026 &mdash; 30 days each. Observational pre/post, not an A/B test.</p>
-    </div>
-
-    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(185px,1fr));gap:12px">
-      <div class="tile"><span class="s">Click rate (clicks/sends)</span><span class="v">13.2% &rarr; 17.0%</span><span class="s"><strong>Increase +3.8pp &mdash; statistically significant</strong></span></div>
-      <div class="tile"><span class="s">Click-to-open (clicks/opens)</span><span class="v">26.1% &rarr; 37.2%</span><span class="s"><strong>Increase +11.1pp &mdash; statistically significant</strong></span></div>
-      <div class="tile"><span class="s">Bounce rate</span><span class="v">0.56% &rarr; 0.95%</span><span class="s"><strong>Increase +0.39pp &mdash; statistically significant</strong></span></div>
-      <div class="tile"><span class="s">Filtered open rate</span><span class="v">50.6% &rarr; 45.7%</span><span class="s"><strong>Decrease &minus;4.8pp &mdash; statistically significant</strong></span></div>
-    </div>
-
-    <div>
-      <h3>Did snipping the preview increase clicks?</h3>
-      <p class="lede" style="max-width:74ch">Yes. Click rate rose from 13.2% to 17.0% (<strong>Increase, statistically significant</strong>), and click-to-open &mdash; which isolates the curiosity effect among people who opened &mdash; rose from 26.1% to 37.2% (<strong>Increase, statistically significant</strong>). The aggregate gain is driven by the three highest-volume campaigns (paid_plan_quote, paid_plan_quote_reminder, sufficient), all of which rose.</p>
-    </div>
-
-    <div style="overflow-x:auto">
-      <h3>Pre vs post &mdash; all 16 campaigns combined</h3>
-      <table>
-        <thead><tr><th class="l">Metric</th><th>Pre (5 Aug&ndash;3 Sep)</th><th>Post (4 Sep&ndash;3 Oct)</th><th>Change</th></tr></thead>
-        <tbody>
-          <tr><td class="l">Sends</td><td>7,661</td><td>6,224</td><td>&mdash;</td></tr>
-          <tr><td class="l">Clicks</td><td>1,010</td><td>1,058</td><td>&mdash;</td></tr>
-          <tr><td class="l">Click rate</td><td>13.18%</td><td>17.00%</td><td><strong>Increase +3.82pp</strong></td></tr>
-          <tr><td class="l">Click-to-open rate</td><td>26.08%</td><td>37.17%</td><td><strong>Increase +11.10pp</strong></td></tr>
-          <tr><td class="l">Filtered open rate</td><td>50.55%</td><td>45.73%</td><td><strong>Decrease &minus;4.83pp</strong></td></tr>
-          <tr><td class="l">Bounce rate</td><td>0.56%</td><td>0.95%</td><td><strong>Increase +0.39pp</strong></td></tr>
-          <tr><td class="l">Unsub rate</td><td>0.05%</td><td>0.03%</td><td>Decrease &minus;0.02pp</td></tr>
-        </tbody>
-      </table>
-      <p class="footnote">Bold = statistically significant (two-proportion z-test, p&lt;0.05). Click rate z=6.28, p&lt;0.0001; click-to-open z=9.74, p&lt;0.0001; open rate z=&minus;5.66, p&lt;0.0001; bounce z=2.65, p=0.008. Unsub change is not significant.</p>
-    </div>
-
-    <div style="overflow-x:auto">
-      <h3>By campaign &mdash; click rate pre vs post</h3>
-      <table>
-        <thead><tr><th class="l">Campaign (seller_message_&hellip;)</th><th>Pre sends</th><th>Pre CTR</th><th>Post sends</th><th>Post CTR</th><th>&Delta;</th></tr></thead>
-        <tbody><tr><td class="l mono">paid_plan_quote</td><td>2,908</td><td>13.3%</td><td>2,424</td><td>19.9%</td><td>+6.6pp</td></tr><tr><td class="l mono">paid_plan_quote_reminder</td><td>1,752</td><td>10.3%</td><td>1,487</td><td>11.7%</td><td>+1.4pp</td></tr><tr><td class="l mono">sufficient</td><td>1,025</td><td>11.2%</td><td>974</td><td>17.5%</td><td>+6.2pp</td></tr><tr><td class="l mono">free_quote</td><td>494</td><td>19.4%</td><td>271</td><td>19.9%</td><td>+0.5pp</td></tr><tr><td class="l mono">free_trial_quote</td><td>288</td><td>24.0%</td><td>249</td><td>28.1%</td><td>+4.1pp</td></tr><tr><td class="l mono">free_quote_reminder</td><td>228</td><td>8.8%</td><td>147</td><td>14.3%</td><td>+5.5pp</td></tr><tr><td class="l mono">free_trial_quote_reminder</td><td>199</td><td>17.6%</td><td>177</td><td>13.6%</td><td>&minus;4.0pp</td></tr><tr><td class="l mono">approaching_reminder</td><td>170</td><td>9.4%</td><td>175</td><td>12.0%</td><td>+2.6pp</td></tr><tr><td class="l mono">free_trial_ne_message</td><td>119</td><td>16.0%</td><td>56</td><td>25.0%</td><td>+9.0pp</td></tr><tr><td class="l mono">free_trial_eligible_quote</td><td>117</td><td>12.0%</td><td>70</td><td>12.9%</td><td>+0.9pp</td></tr><tr><td class="l mono">free_trial_message_mktg</td><td>102</td><td>28.4%</td><td>31</td><td>22.6%</td><td>&minus;5.8pp</td></tr><tr><td class="l mono">free_trial_eligible_quote_reminder</td><td>83</td><td>10.8%</td><td>47</td><td>2.1%</td><td>&minus;8.7pp</td></tr><tr><td class="l mono">free_trial_ne_message_reminder</td><td>51</td><td>5.9%</td><td>38</td><td>7.9%</td><td>+2.0pp</td></tr><tr><td class="l mono">free_message</td><td>50</td><td>16.0%</td><td>36</td><td>16.7%</td><td>+0.7pp</td></tr><tr><td class="l mono">free_message_reminder</td><td>47</td><td>6.4%</td><td>34</td><td>2.9%</td><td>&minus;3.5pp</td></tr><tr><td class="l mono">free_trial_message_reminder</td><td>28</td><td>17.9%</td><td>8</td><td>12.5%</td><td>&minus;5.4pp</td></tr></tbody>
-        <tfoot><tr><td class="l"><strong>All campaigns</strong></td><td><strong>7,661</strong></td><td><strong>13.2%</strong></td><td><strong>6,224</strong></td><td><strong>17.0%</strong></td><td><strong>+3.8pp</strong></td></tr></tfoot>
-      </table>
-      <p class="footnote">The aggregate gain is carried by the three highest-volume campaigns. Small-volume campaigns that fell (e.g. eligible_quote_reminder at 47 sends) are too low to read individually.</p>
-    </div>
-
-    <div class="callout" style="background:var(--warn-bg);border-color:color-mix(in srgb,var(--warn) 30%,transparent);color:var(--ink)">
-      <strong>Read with care</strong>
-      <span>This is an observational pre/post comparison, not an A/B test, so audience mix, seasonality and the lower post-period send volume can't be fully ruled out &mdash; but the click-rate and click-to-open gains are large and highly significant, and the click-to-open jump is the signature you'd expect if snipping drives curiosity among openers. Two secondary moves to monitor: filtered opens fell ~5pp (likely audience/deliverability drift, not the in-body snip), and bounce rose a small but significant 0.39pp (a message snip should not affect deliverability).</span>
-    </div>
-
-    <p class="footnote">Sources: Tableau &#128193; Email - Country-Date-Domain-Campaign (16 seller_message campaign IDs; sends, clicks, filtered opens, bounces, unsubs; windows 5 Aug&ndash;3 Sep and 4 Sep&ndash;3 Oct 2026); Iterable journey 746944; two-proportion z-tests in Python.</p>
-  </section>
 </div>
 
 <script>
 /* ---------------- data ---------------- */
-// Iterable campaign metrics. d30 = 2 Sep-1 Oct 2026, d7 = 25 Sep-1 Oct 2026.
+// Iterable campaign metrics. d30 = 9 Sep-8 Oct 2026, d7 = 2-8 Oct 2026.
 // 20109309/20109353/20109511 are the A/B test variants, live from 29 Sep, so d30 = d7 for them.
 // send/deliv/bounce count messages; u* count distinct users.
 const M = {
-  19381134:{d30:{send:893,deliv:890,bounce:3,uSend:262,uDeliv:261,uOpen:150,uOpenF:147,uClick:89,uUnsub:4},
-            d7 :{send:185,deliv:185,bounce:0,uSend:62, uDeliv:62, uOpen:49, uOpenF:47, uClick:26,uUnsub:0}},
-  19381812:{d30:{send:2505,deliv:2487,bounce:18,uSend:634,uDeliv:623,uOpen:382,uOpenF:377,uClick:222,uUnsub:21},
-            d7 :{send:394, deliv:392, bounce:2, uSend:150,uDeliv:148,uOpen:90, uOpenF:87, uClick:49, uUnsub:4}},
-  20109309:{d30:{send:36,deliv:36,bounce:0,uSend:22,uDeliv:22,uOpen:11,uOpenF:11,uClick:3,uUnsub:0},
-            d7 :{send:36,deliv:36,bounce:0,uSend:22,uDeliv:22,uOpen:11,uOpenF:11,uClick:3,uUnsub:0}},
-  20109353:{d30:{send:97,deliv:97,bounce:0,uSend:59,uDeliv:59,uOpen:27,uOpenF:27,uClick:14,uUnsub:1},
-            d7 :{send:97,deliv:97,bounce:0,uSend:59,uDeliv:59,uOpen:27,uOpenF:27,uClick:14,uUnsub:1}},
-  19381863:{d30:{send:78,deliv:78,bounce:0,uSend:36,uDeliv:36,uOpen:16,uOpenF:16,uClick:7,uUnsub:4},
-            d7 :{send:10,deliv:10,bounce:0,uSend:8, uDeliv:8, uOpen:2, uOpenF:2, uClick:1,uUnsub:0}},
-  20109511:{d30:{send:4,deliv:4,bounce:0,uSend:3,uDeliv:3,uOpen:0,uOpenF:0,uClick:0,uUnsub:0},
-            d7 :{send:4,deliv:4,bounce:0,uSend:3,uDeliv:3,uOpen:0,uOpenF:0,uClick:0,uUnsub:0}},
-  13384256:{d30:{send:1517,deliv:1515,uSend:378,uDeliv:376,uOpen:130,uninst:3},
-            d7 :{send:314, deliv:314, uSend:98, uDeliv:98, uOpen:25, uninst:0}},
-  17690487:{d30:{send:4,deliv:4,uSend:4,uDeliv:4,uOpen:0,uninst:0},
-            d7 :{send:0,deliv:0,uSend:0,uDeliv:0,uOpen:0,uninst:0}},
-  16373389:{d30:{send:19,deliv:19,uSend:8,uDeliv:8,uOpen:1,uninst:0},
-            d7 :{send:2, deliv:2, uSend:1,uDeliv:1,uOpen:0,uninst:0}},
-  16985565:{d30:{send:334,deliv:330,bounce:4,uSend:251,uDeliv:247,uClick:224,uClickF:215},
+  19381134:{d30:{send:1154,deliv:1153,bounce:1,uSend:363,uDeliv:362,uOpen:237,uOpenF:204,uClick:121,uUnsub:7},
+            d7 :{send:412, deliv:411, bounce:1,uSend:170,uDeliv:169,uOpen:128,uOpenF:95, uClick:54, uUnsub:3}},
+  19381812:{d30:{send:2501,deliv:2484,bounce:17,uSend:733,uDeliv:723,uOpen:444,uOpenF:417,uClick:239,uUnsub:19},
+            d7 :{send:567, deliv:566, bounce:1, uSend:256,uDeliv:255,uOpen:159,uOpenF:135,uClick:67, uUnsub:3}},
+  20109309:{d30:{send:446,deliv:446,bounce:0,uSend:189,uDeliv:189,uOpen:133,uOpenF:103,uClick:57,uUnsub:3},
+            d7 :{send:410,deliv:410,bounce:0,uSend:172,uDeliv:172,uOpen:125,uOpenF:95, uClick:55,uUnsub:3}},
+  20109353:{d30:{send:666,deliv:665,bounce:1,uSend:278,uDeliv:277,uOpen:160,uOpenF:132,uClick:74,uUnsub:6},
+            d7 :{send:569,deliv:568,bounce:1,uSend:239,uDeliv:238,uOpen:142,uOpenF:114,uClick:64,uUnsub:5}},
+  19381863:{d30:{send:76,deliv:76,bounce:0,uSend:37,uDeliv:37,uOpen:19,uOpenF:19,uClick:10,uUnsub:4},
+            d7 :{send:16,deliv:16,bounce:0,uSend:9, uDeliv:9, uOpen:5, uOpenF:5, uClick:3, uUnsub:0}},
+  20109511:{d30:{send:20,deliv:20,bounce:0,uSend:12,uDeliv:12,uOpen:4,uOpenF:4,uClick:1,uUnsub:1},
+            d7 :{send:16,deliv:16,bounce:0,uSend:11,uDeliv:11,uOpen:4,uOpenF:4,uClick:1,uUnsub:1}},
+  13384256:{d30:{send:2011,deliv:2008,uSend:467,uDeliv:464,uOpen:152,uninst:4},
+            d7 :{send:821, deliv:820, uSend:196,uDeliv:195,uOpen:61, uninst:2}},
+  17690487:{d30:{send:3,deliv:3,uSend:3,uDeliv:3,uOpen:0,uninst:0},
+            d7 :{send:1,deliv:1,uSend:1,uDeliv:1,uOpen:0,uninst:0}},
+  16373389:{d30:{send:24,deliv:24,uSend:9,uDeliv:9,uOpen:1,uninst:0},
+            d7 :{send:12,deliv:12,uSend:3,uDeliv:3,uOpen:0,uninst:0}},
+  16985565:{d30:{send:246,deliv:242,bounce:4,uSend:193,uDeliv:189,uClick:188,uClickF:187},
             d7 :{send:0,  deliv:0,  bounce:0,uSend:0,  uDeliv:0,  uClick:0,  uClickF:0}},
   19984008:{d30:{send:165,deliv:164,bounce:1,uSend:123,uDeliv:122,uClick:118,uClickF:118},
-            d7 :{send:121,deliv:120,bounce:1,uSend:98, uDeliv:97, uClick:94, uClickF:94}},
-  20110136:{d30:{send:27,deliv:27,bounce:0,uSend:26,uDeliv:26,uClick:24,uClickF:24},
-            d7 :{send:27,deliv:27,bounce:0,uSend:26,uDeliv:26,uClick:24,uClickF:24}},
-  16988774:{d30:{send:26,deliv:26,bounce:0,uSend:21,uDeliv:21,uClick:20,uClickF:19},
-            d7 :{send:7, deliv:7, bounce:0,uSend:7, uDeliv:7, uClick:7, uClickF:7}}
+            d7 :{send:0,  deliv:0,  bounce:0,uSend:0,  uDeliv:0,  uClick:0,  uClickF:0}},
+  20110136:{d30:{send:410,deliv:406,bounce:4,uSend:325,uDeliv:321,uClick:233,uClickF:206},
+            d7 :{send:383,deliv:379,bounce:4,uSend:308,uDeliv:304,uClick:218,uClickF:191}},
+  16988774:{d30:{send:32,deliv:32,bounce:0,uSend:24,uDeliv:24,uClick:20,uClickF:19},
+            d7 :{send:12,deliv:12,bounce:0,uSend:9, uDeliv:9, uClick:5, uClickF:4}}
 };
 
-// Warehouse (insight_roots.*_log_iterable), filtered on campaign_group = buyer_chat_notification, 2 Sep - 1 Oct.
+// Warehouse (insight_roots.*_log_iterable), filtered on campaign_group = buyer_chat_notification, 9 Sep - 8 Oct.
 // That covers both workflow 643021 and the new SMS workflow 1068778, and nothing outside them.
-const WAREHOUSE = {email:{msgs:3662,buyers:902}, push:{msgs:1538,buyers:380}, sms:{msgs:552,buyers:381}};
+const WAREHOUSE = {email:{msgs:4892,buyers:1178}, push:{msgs:2056,buyers:471}, sms:{msgs:853,buyers:600}};
 // 30-day channel overlap, distinct buyers (warehouse send logs, non-skipped, buyer_user_id not null)
 const OVERLAP = {
-  d30:{total:912, emailPush:290, emailSms:288, emailOnly:238, all:86, pushSms:1, smsOnly:6, pushOnly:3},
-  d7 :{total:242, emailPush:77,  emailSms:91,  emailOnly:47,  all:20, pushSms:0, smsOnly:5, pushOnly:2}
+  d30:{total:1189, emailPush:299, emailSms:421, emailOnly:290, all:168, pushSms:4, smsOnly:7, pushOnly:0},
+  d7 :{total:536,  emailPush:97,  emailSms:209, emailOnly:127, all:99,  pushSms:3, smsOnly:1, pushOnly:0}
 };
 // Deduplicated distinct buyers reached, warehouse send logs
 const REACH = {
-  d30:{total:912, email:902, push:380, sms:381, neither:238},
-  d7 :{total:242, email:235, push:99,  sms:116, neither:47}
+  d30:{total:1189, email:1178, push:471, sms:600, neither:290},
+  d7 :{total:536,  email:532,  push:199, sms:312, neither:127}
 };
 // Iterable segments: triggered the chat message event, SMS opted in, phone number on file
-const SMS_POOL = {d30:569, d7:171};
+const SMS_POOL = {d30:738, d7:332};
 // insight_reporting.crm_sms_push_whatsapp, attribution_mode = any_7d_post_send
 const AFTER = {
-  d30:{label:"2 Sep - 1 Oct",
-       push:{send:1538, eligible:727, session:145, message:138},
-       sms :{send:552,  eligible:540, session:113, message:70}},
-  d7 :{label:"25 Sep - 1 Oct",
-       push:{send:318, eligible:155, session:45, message:39},
-       sms :{send:153, eligible:148, session:38, message:23}}
+  d30:{label:"9 Sep - 8 Oct",
+       push:{send:2056, eligible:867, session:187, message:184},
+       sms :{send:853,  eligible:842, session:171, message:113}},
+  d7 :{label:"2 - 8 Oct",
+       push:{send:849, eligible:296, session:78, message:75},
+       sms :{send:398, eligible:397, session:88, message:60}}
 };
 
 // Tableau, published datasource "Enquiry" (Polaris enquiries, marketplace-wide - not filtered to this journey)
 const ENQ = {
-  d30:{label:"2 Sep - 1 Oct", enq:3144, enqResp:1936, onPlat:1606, msgReply:1594, consResp:413, consChat:392, buyers:976, buyersResp:835, sessions:1005, medianReply:92},
-  d7 :{label:"25 Sep - 1 Oct", enq:652,  enqResp:401,  onPlat:340,  msgReply:340,  consResp:92,  consChat:92,  buyers:209, buyersResp:180, sessions:217,  medianReply:84}
+  d30:{label:"9 Sep - 8 Oct", enq:4719, enqResp:2746, onPlat:2297, msgReply:2286, consResp:557, consChat:544, buyers:1361, buyersResp:1148, sessions:1417, medianReply:81},
+  d7 :{label:"2 - 8 Oct",     enq:2263, enqResp:1204, onPlat:1016, msgReply:1016, consResp:233, consChat:233, buyers:588,  buyersResp:487,  sessions:615,  medianReply:65}
 };
 // Buyer response rate by week - used to show the maturity lag
-const ENQ_WEEKS = [["7-13 Sep",588,131],["14-20 Sep",460,89],["21-27 Sep",385,81],["28 Sep-1 Oct",304,72]];
+const ENQ_WEEKS = [["14-20 Sep",461,89],["21-27 Sep",389,82],["28 Sep-4 Oct",483,111],["5-8 Oct",1082,205]];
 
 const NAMES = {
   19381134:["Email 1 &mdash; new design (marketing)","buyer_chat_message_260813_2"],
@@ -811,7 +753,14 @@ const TL_SMS = [
    "<strong>To review in the session next week:</strong> whether splitting it out has moved SMS delivery at all, and &mdash; if it hasn't &mdash; to walk the drop-out points in the new workflow and pull named buyers at each one to find out why they fall out.",
    "<strong>Handover from the old campaign:</strong> <a href='https://app.iterable.com/campaigns/19984008' target='_blank' rel='noopener'>19984008</a> has been disconnected from workflow 643021 and will send no more. It carried 55 messages on 29&ndash;30 Sep before the switch, so SMS in those two days is split across the two campaigns and has to be read together. From 30 Sep, all SMS volume is 20110136.",
    "First send through the new workflow landed the same afternoon &mdash; 1 sent, 1 delivered. Worth a volume check in a day or two against the recent run rate of roughly 17&ndash;18 messages a day: if 20110136 comes in materially under that, the new workflow is dropping buyers the old branch was catching, which is its own finding.",
-   "<strong>Reporting note:</strong> this report and its Hex queries filter on <span class='mono'>workflowId = 643021</span>, which will not see 20110136. It does carry the <span class='mono'>buyer_chat_notification</span> label, so the filter needs to move to campaign_group, or to both workflow IDs, before the next refresh &mdash; otherwise SMS volume will appear to collapse to zero."]]
+   "<strong>Reporting note:</strong> this report and its Hex queries filter on <span class='mono'>workflowId = 643021</span>, which will not see 20110136. It does carry the <span class='mono'>buyer_chat_notification</span> label, so the filter needs to move to campaign_group, or to both workflow IDs, before the next refresh &mdash; otherwise SMS volume will appear to collapse to zero."]],
+ ["9 Oct 2026","SMS volume is up fourfold &mdash; but it is not an SMS fix",
+  ["<strong>The headline number is real.</strong> SMS 1 sent 383 messages in the last 7 days against 148 the week before, and 24/day over 30 Sep&ndash;5 Oct became 97/day over 6&ndash;8 Oct. Bounces are near zero throughout.",
+   "<strong>But the cause is not the workflow move or the casing fix.</strong> The step came on <strong>6 Oct</strong>, not 30 Sep when SMS moved to workflow 1068778. Through 30 Sep&ndash;5 Oct on the new workflow, volume ran at 13&ndash;30 a day &mdash; exactly the old rate.",
+   "<strong>Email stepped up on the same day by the same factor</strong>, from roughly 100&ndash;160 a day to 451, 590 and 499 on 6&ndash;8 Oct. SMS as a share of comm #1 email volume is <strong>18.8% after 6 Oct against 19.8% before</strong>. SMS did not gain ground on the rest of the journey; it rose in step with it.",
+   "<strong>The source is upstream of CRM.</strong> Polaris enquiries marketplace-wide went from 149 on 5 Oct to 576, 607 and 597 on 6&ndash;8 Oct &mdash; the same fourfold step on the same day. The journey is doing what it always did, on four times the input.",
+   "<strong>Worth raising outside CRM.</strong> A fourfold overnight step in enquiry volume is either a genuine demand or traffic event, a migration of volume onto Polaris, or a pipeline change. Which one it is determines whether these numbers are a new baseline or an artefact, and nothing in the CRM data can settle it. Worth putting to Neil and the insights team.",
+   "<strong>Still open:</strong> the SMS eligibility gap itself has not been diagnosed. Reach against the opted-in pool improved to 600 of 738 over 30 days, but both sides grew with the volume step, so this is not evidence the logic changed."]]
 ];
 
 const TL_EMAIL = [
@@ -834,19 +783,19 @@ const TL_EMAIL = [
 
 // Tableau daily [date, sends, opens] for the two live comm-#1 emails
 const DAILY_EMAIL = [
-  ["09-02",59,28], ["09-03",117,51], ["09-04",77,28], ["09-05",75,42], ["09-06",51,32], ["09-07",155,63],
-  ["09-08",191,89], ["09-09",226,108], ["09-10",152,78], ["09-11",23,12], ["09-12",71,35], ["09-13",154,74],
-  ["09-14",201,81], ["09-15",192,86], ["09-16",119,44], ["09-17",111,41], ["09-18",91,53], ["09-19",68,36],
-  ["09-20",111,68], ["09-21",175,106], ["09-22",124,67], ["09-23",129,76], ["09-24",154,99], ["09-25",81,48],
-  ["09-26",60,20], ["09-27",86,45], ["09-28",134,74], ["09-29",107,62], ["09-30",117,42], ["10-01",126,71]
+  ["09-09",226,108], ["09-10",152,78], ["09-11",23,12], ["09-12",71,35], ["09-13",154,74], ["09-14",201,81],
+  ["09-15",192,86], ["09-16",119,44], ["09-17",111,41], ["09-18",91,53], ["09-19",68,36], ["09-20",111,68],
+  ["09-21",175,106], ["09-22",124,67], ["09-23",129,76], ["09-24",154,100], ["09-25",81,48], ["09-26",60,20],
+  ["09-27",86,45], ["09-28",134,75], ["09-29",107,62], ["09-30",117,45], ["10-01",126,78], ["10-02",107,48],
+  ["10-03",72,45], ["10-04",104,43], ["10-05",161,83], ["10-06",451,246], ["10-07",590,351], ["10-08",499,309]
 ];
 // Tableau daily [date, sends, clicks] for SMS 1
 const DAILY_SMS = [
-  ["09-02",16,8], ["09-03",10,4], ["09-04",10,4], ["09-05",5,3], ["09-06",8,4], ["09-07",17,10],
-  ["09-08",25,24], ["09-09",30,27], ["09-10",21,19], ["09-11",6,5], ["09-12",11,11], ["09-13",21,21],
-  ["09-14",22,22], ["09-15",18,17], ["09-16",21,21], ["09-17",11,11], ["09-18",14,13], ["09-19",11,11],
-  ["09-20",22,21], ["09-21",23,22], ["09-22",16,16], ["09-23",21,21], ["09-24",20,19], ["09-25",23,22],
-  ["09-26",8,7], ["09-27",12,12], ["09-28",28,28], ["09-29",28,27], ["09-30",28,27], ["10-01",20,18]
+  ["09-09",30,27], ["09-10",21,19], ["09-11",6,5], ["09-12",11,11], ["09-13",21,21], ["09-14",22,22],
+  ["09-15",18,17], ["09-16",21,21], ["09-17",11,11], ["09-18",14,13], ["09-19",11,11], ["09-20",22,21],
+  ["09-21",23,22], ["09-22",16,16], ["09-23",21,21], ["09-24",20,19], ["09-25",23,22], ["09-26",8,7],
+  ["09-27",12,12], ["09-28",28,28], ["09-29",28,27], ["09-30",28,27], ["10-01",20,18], ["10-02",28,27],
+  ["10-03",13,13], ["10-04",27,27], ["10-05",28,28], ["10-06",66,52], ["10-07",115,70], ["10-08",109,53]
 ];
 
 /* ---------------- helpers ---------------- */
@@ -994,10 +943,10 @@ function render(win){
     <td>${fpc(pc(st.deliv,st.send))}</td><td>&mdash;</td><td>${fpc(pc(st.uClick,st.uDeliv))}</td><td>${fpc(pc(st.uClickF,st.uDeliv))}</td></tr>`;
   document.getElementById("smsRows").innerHTML=rows;
 
-  const sc=w=>({uClick:SMS1.reduce((a,i)=>a+M[i][w].uClick,0), uDeliv:SMS1.reduce((a,i)=>a+M[i][w].uDeliv,0)});
+  const sc=w=>({uClick:SMS1.reduce((a,i)=>a+M[i][w].uClick,0), uClickF:SMS1.reduce((a,i)=>a+M[i][w].uClickF,0), uDeliv:SMS1.reduce((a,i)=>a+M[i][w].uDeliv,0)});
   const s30=sc("d30"), s7=sc("d7");
   document.getElementById("smsWarn").innerHTML =
-    `SMS 1 recorded <strong>${fnum(s7.uClick)} unique clickers against ${fnum(s7.uDeliv)} delivered buyers</strong> in the last 7 days &mdash; ${fpc(pc(s7.uClick,s7.uDeliv))}, which is not plausible human behaviour. Over 30 days it reads ${fpc(pc(s30.uClick,s30.uDeliv))}. Neither the 22 Sep rebuild nor the 30 Sep move to a separate workflow changed it: 19984008 runs at ${fpc(pc(M[19984008].d30.uClick,M[19984008].d30.uDeliv))} and the new 20110136 at ${fpc(pc(M[20110136].d30.uClick,M[20110136].d30.uDeliv))}. Confirmed 30 Sep as faulty bot detection &mdash; see below.`;
+    `SMS 1 recorded <strong>${fnum(s7.uClick)} unique clickers against ${fnum(s7.uDeliv)} delivered buyers</strong> in the last 7 days &mdash; ${fpc(pc(s7.uClick,s7.uDeliv))}, against ${fpc(pc(s30.uClick,s30.uDeliv))} over 30 days. Still not plausible as human behaviour, but it has <strong>fallen sharply</strong>: the daily rate ran at 95&ndash;100% through September and dropped to roughly 46&ndash;79% from 6 Oct. Filtered and unfiltered have also separated again (${fnum(s7.uClick)} against ${fnum(s7.uClickF)} unique clickers), after converging through September.`;
 
   // --- marketplace response ---
   document.getElementById("e-seller").innerHTML = fpc(pc(E.enqResp,E.enq));
@@ -1104,7 +1053,7 @@ function buildTimeline(el,items){
 }
 
 /* ---------------- tabs ---------------- */
-const tabs=[["tab-perf","p-perf"],["tab-tests","p-tests"],["tab-arch","p-arch"],["tab-seller","p-seller"]];
+const tabs=[["tab-perf","p-perf"],["tab-tests","p-tests"],["tab-arch","p-arch"]];
 tabs.forEach(([t,p])=>{
   document.getElementById(t).addEventListener("click",()=>{
     tabs.forEach(([t2,p2])=>{
@@ -1131,8 +1080,8 @@ drawWeekChart();
 buildArchive();
 buildTimeline("tlSms",TL_SMS);
 buildTimeline("tlEmail",TL_EMAIL);
-comboChart(document.getElementById("emailChart"),DAILY_EMAIL,cssv("--email"),"Email open rate",[]);
-comboChart(document.getElementById("smsChart"),DAILY_SMS,cssv("--sms"),"SMS click rate",[[6,"quiet hours off",true],[28,"own workflow",false]]);
+comboChart(document.getElementById("emailChart"),DAILY_EMAIL,cssv("--email"),"Email open rate",[[27,"journey volume 4x",false]]);
+comboChart(document.getElementById("smsChart"),DAILY_SMS,cssv("--sms"),"SMS click rate",[[21,"own workflow",true],[27,"journey volume 4x",false]]);
 </script>
 
 </body>
